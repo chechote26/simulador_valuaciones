@@ -1,0 +1,1785 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cotizador DNRPA — Toyota + Nissan + Fiat + Renault + Volkswagen — Vigencia 01/03/2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0a;
+    --surface: #111111;
+    --surface2: #1a1a1a;
+    --border: #2a2a2a;
+    --accent: #e8d5a3;
+    --accent2: #c8a96e;
+    --text: #e8e8e8;
+    --muted: #666;
+    --red: #cc4444;
+    --green: #4a9;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'IBM Plex Sans', sans-serif;
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  header {
+    border-bottom: 1px solid var(--border);
+    padding: 24px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--surface);
+  }
+
+  .logo {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+  }
+
+  .logo h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2.4rem;
+    letter-spacing: 3px;
+    color: var(--accent);
+    line-height: 1;
+  }
+
+  .logo span {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--muted);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .vigencia {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--muted);
+    text-align: right;
+  }
+
+  .vigencia strong {
+    display: block;
+    color: var(--accent);
+    font-size: 0.85rem;
+  }
+
+  /* MAIN */
+  main {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 48px 24px;
+  }
+
+  .intro {
+    margin-bottom: 40px;
+  }
+
+  .intro h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.8rem;
+    letter-spacing: 2px;
+    color: var(--accent);
+    margin-bottom: 6px;
+  }
+
+  .intro p {
+    font-size: 0.85rem;
+    color: var(--muted);
+    font-family: 'IBM Plex Mono', monospace;
+  }
+
+  /* FORM */
+  .search-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .field label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--muted);
+  }
+
+  .field select, .field input {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 12px 14px;
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 0.9rem;
+    outline: none;
+    transition: border-color 0.2s;
+    -webkit-appearance: none;
+    appearance: none;
+    cursor: pointer;
+    width: 100%;
+  }
+
+  .field select:focus, .field input:focus {
+    border-color: var(--accent2);
+  }
+
+  .field select option {
+    background: #1a1a1a;
+  }
+
+  .select-wrap {
+    position: relative;
+  }
+
+  .select-wrap::after {
+    content: '▾';
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--accent2);
+    pointer-events: none;
+    font-size: 0.8rem;
+  }
+
+  .btn-buscar {
+    width: 100%;
+    background: var(--accent);
+    color: #0a0a0a;
+    border: none;
+    padding: 14px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.1rem;
+    letter-spacing: 3px;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+    margin-top: 4px;
+  }
+
+  .btn-buscar:hover { background: var(--accent2); }
+  .btn-buscar:active { transform: scale(0.99); }
+
+  .btn-limpiar {
+    width: 100%;
+    background: transparent;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    padding: 10px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: color 0.2s, border-color 0.2s;
+  }
+
+  .btn-limpiar:hover { color: var(--text); border-color: var(--muted); }
+
+  /* RESULTS */
+  #resultado {
+    margin-top: 40px;
+  }
+
+  .result-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .result-count {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .result-count strong {
+    color: var(--accent);
+    font-size: 1rem;
+  }
+
+  /* CARD */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    margin-bottom: 16px;
+    overflow: hidden;
+    animation: fadeIn 0.3s ease;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .card-head {
+    padding: 16px 20px;
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .card-title {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .card-modelo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.3rem;
+    letter-spacing: 2px;
+    color: var(--accent);
+    line-height: 1;
+  }
+
+  .card-marca {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--muted);
+  }
+
+  .card-tipo {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--accent2);
+    background: rgba(200, 169, 110, 0.1);
+    padding: 3px 8px;
+    letter-spacing: 1px;
+    white-space: nowrap;
+    align-self: flex-start;
+  }
+
+  .card-body {
+    padding: 16px 20px;
+  }
+
+  /* PRICE TABLE */
+  .price-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .price-table th {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--muted);
+    text-align: left;
+    padding: 6px 10px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .price-table td {
+    padding: 8px 10px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.82rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .price-table tr:last-child td { border-bottom: none; }
+
+  .price-table td.anio {
+    color: var(--muted);
+    font-size: 0.75rem;
+  }
+
+  .price-table td.precio {
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  .price-table td.precio span {
+    font-size: 0.65rem;
+    color: var(--muted);
+    margin-right: 2px;
+  }
+
+  .price-table tr.highlighted td {
+    background: rgba(232, 213, 163, 0.06);
+  }
+
+  .price-table tr.highlighted td.anio {
+    color: var(--accent);
+  }
+
+  .price-table tr.highlighted td.precio {
+    color: var(--accent);
+    font-size: 0.9rem;
+  }
+
+  /* price grid layout for many years */
+  .prices-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 8px;
+  }
+
+  .price-chip {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .price-chip.highlight {
+    border-color: var(--accent2);
+    background: rgba(232, 213, 163, 0.05);
+  }
+
+  .price-chip .chip-anio {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.6rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .price-chip.highlight .chip-anio {
+    color: var(--accent);
+  }
+
+  .price-chip .chip-valor {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.85rem;
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  .price-chip.highlight .chip-valor {
+    color: var(--accent);
+    font-size: 0.95rem;
+  }
+
+  .chip-currency {
+    font-size: 0.65rem;
+    color: var(--muted);
+  }
+
+  /* NO RESULTS */
+  .no-result {
+    text-align: center;
+    padding: 60px 20px;
+    font-family: 'IBM Plex Mono', monospace;
+    color: var(--muted);
+    font-size: 0.85rem;
+    border: 1px dashed var(--border);
+  }
+
+  .no-result span {
+    display: block;
+    font-size: 2rem;
+    margin-bottom: 12px;
+    opacity: 0.4;
+  }
+
+  /* FOOTER */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 20px 40px;
+    text-align: center;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.6rem;
+    color: var(--muted);
+    letter-spacing: 1px;
+  }
+
+  @media (max-width: 600px) {
+    header { padding: 16px 20px; flex-direction: column; gap: 12px; align-items: flex-start; }
+    main { padding: 24px 16px; }
+    .search-grid { grid-template-columns: 1fr; }
+    .prices-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <h1>Cotizador</h1>
+  </div>
+  <div class="vigencia">
+    Vigencia<br>
+    <strong>01 / 03 / 2026</strong>
+  </div>
+</header>
+
+<main>
+  <div class="intro">
+    <h2>Consulta de cotizaciones</h2>
+    <p>// Ingresá los datos del vehículo para obtener el valor de tabla</p>
+  </div>
+
+  <div class="search-grid">
+    <div class="field">
+      <label>Marca</label>
+      <div class="select-wrap">
+        <select id="sel-marca" onchange="updateModelos()">
+          <option value="">— Seleccionar —</option>
+        </select>
+      </div>
+    </div>
+    <div class="field">
+      <label>Modelo</label>
+      <div class="select-wrap">
+        <select id="sel-modelo" onchange="updateTipos()" disabled>
+          <option value="">— Seleccionar —</option>
+        </select>
+      </div>
+    </div>
+    <div class="field">
+      <label>Tipo</label>
+      <div class="select-wrap">
+        <select id="sel-tipo" disabled>
+          <option value="">— Seleccionar —</option>
+        </select>
+      </div>
+    </div>
+    <div class="field">
+      <label>Año</label>
+      <div class="select-wrap">
+        <select id="sel-anio">
+          <option value="">— Todos los años —</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <button class="btn-buscar" onclick="buscar()">BUSCAR COTIZACIÓN</button>
+  <button class="btn-limpiar" onclick="limpiar()">↺ Limpiar</button>
+
+  <div id="resultado"></div>
+</main>
+
+<footer>
+  DATOS EXTRAÍDOS DEL PADRÓN DNRPA — SOLO USO REFERENCIAL — VIGENCIA 01/03/2026
+</footer>
+
+<script>
+// ============================================================
+// DATOS COMPLETOS EXTRAÍDOS DEL PDF DNRPA (Toyota + otros)
+// Columnas: marca, modelo, tipo, [0km, 2025, 2024, ... 2002]
+// ============================================================
+const ANOS = ['0Km','2025','2024','2023','2022','2021','2020','2019','2018','2017','2016','2015','2014','2013','2012','2011','2010','2009','2008','2007','2006','2005','2004','2003','2002'];
+
+const DATA = [
+// TOYOTA
+{marca:'TOYOTA',modelo:'4 RUNNER TD 3.0',tipo:'TODO TERRENO',precios:{2017:6885500,2016:6541200,2015:6183700,2014:5874500}},
+{marca:'TOYOTA',modelo:'4WD CABINA SIMPLE',tipo:'PICK-UP',precios:{'0Km':8080600}},
+{marca:'TOYOTA',modelo:'AURIS',tipo:'SEDAN 5 PUERTAS',precios:{2021:5838000,2020:5546000,2019:5269000,2018:5005000,2017:4755000,2016:4517000,2015:4291000}},
+{marca:'TOYOTA',modelo:'AVALON XLS',tipo:'SEDAN 4 PUERTAS',precios:{2002:4445000}},
+{marca:'TOYOTA',modelo:'AVENSIS 1.6 TERRA',tipo:'SEDAN 4 PUERTAS',precios:{2009:8100000,2008:7695040,2007:7310560}},
+{marca:'TOYOTA',modelo:'AVENSIS 1.8',tipo:'RURAL 5 PUERTAS',precios:{2018:5810000,2017:5345000,2016:4917000,2015:4525000,2014:4162000}},
+{marca:'TOYOTA',modelo:'AVENSIS 2.0 A/T',tipo:'SEDAN 4 PUERTAS',precios:{2010:8017000,2009:7616000,2008:7235000,2007:6873000}},
+{marca:'TOYOTA',modelo:'AVENSIS 2.0 M/T',tipo:'SEDAN 4 PUERTAS',precios:{2009:8100000,2008:7695040,2007:7310560}},
+{marca:'TOYOTA',modelo:'AVENSIS 2.2',tipo:'SEDAN 4 PUERTAS',precios:{2010:8017000,2009:7616000,2008:7235000,2007:6873000}},
+{marca:'TOYOTA',modelo:'AVENSIS WT-I',tipo:'SEDAN 4 PUERTAS',precios:{2009:8100000,2008:7695040,2007:7310560}},
+{marca:'TOYOTA',modelo:'CAMRY',tipo:'RURAL 5 PUERTAS',precios:{2018:5810000,2017:5345000,2016:4917000,2015:4525000,2014:4162000}},
+{marca:'TOYOTA',modelo:'CAMRY',tipo:'SEDAN 4 PUERTAS',precios:{'0Km':11620000,2025:10690000,2024:9835000,2023:9049000,2022:8324000,2021:7659000,2020:7046000,2019:6482000,2018:5963000,2017:5487000,2016:5047000}},
+{marca:'TOYOTA',modelo:'CAMRY 2.2',tipo:'SEDAN 4 PUERTAS',precios:{2002:4445000}},
+{marca:'TOYOTA',modelo:'CAMRY 2.4',tipo:'SEDAN 4 PUERTAS',precios:{'0Km':11620000,2025:10690000,2024:9835000,2023:9049000,2022:8324000,2021:7659000,2020:7046000,2019:6482000,2018:5963000,2017:5487000,2016:5047000}},
+{marca:'TOYOTA',modelo:'CAMRY CE',tipo:'SEDAN 4 PUERTAS',precios:{2002:4445000}},
+{marca:'TOYOTA',modelo:'CAMRY DX',tipo:'COUPE',precios:{2002:4445000}},
+{marca:'TOYOTA',modelo:'CAMRY DX',tipo:'SEDAN 4 PUERTAS',precios:{2002:4445000}},
+{marca:'TOYOTA',modelo:'CAMRY GL',tipo:'RURAL 5 PUERTAS',precios:{2002:4445000}},
+{marca:'TOYOTA',modelo:'CAMRY GL',tipo:'SEDAN 4 PUERTAS',precios:{2002:4445000}},
+{marca:'TOYOTA',modelo:'CAMRY HEV 2.5 ECVT',tipo:'SEDAN 4 PUERTAS',precios:{'0Km':121500000,2025:115425000,2024:109653800}},
+{marca:'TOYOTA',modelo:'CAMRY HV 2.5 ECVT',tipo:'SEDAN 4 PUERTAS',precios:{'0Km':121500000,2025:115425000,2024:109653800}},
+{marca:'TOYOTA',modelo:'CAMRY L4 2.5',tipo:'SEDAN 4 PUERTAS',precios:{'0Km':33750000,2025:31050000,2024:28566000,2023:26280500,2022:24178500,2021:22244000,2020:20464700,2019:18827100,2018:17320500,2017:15935400,2016:14661000}},
+{marca:'TOYOTA',modelo:'CAMRY LE',tipo:'RURAL 5 PUERTAS',precios:{2002:4781000}},
+{marca:'TOYOTA',modelo:'CAMRY LE',tipo:'SEDAN 2 PUERTAS',precios:{2002:4781000}},
+{marca:'TOYOTA',modelo:'CAMRY LE',tipo:'SEDAN 4 PUERTAS',precios:{'0Km':12491000,2025:11492000,2024:10572000,2023:9727000,2022:8948000,2021:8233000,2020:7574000,2019:6968000,2018:6410000,2017:5898000,2016:5426000}},
+{marca:'TOYOTA',modelo:'CAMRY SE',tipo:'SEDAN 4 PUERTAS',precios:{2021:22244000,2020:20464700,2019:18827100,2018:17320500,2017:15935400}},
+{marca:'TOYOTA',modelo:'CAMRY V6',tipo:'SEDAN 4 PUERTAS',precios:{'0Km':13931000,2025:12816000,2024:11790000,2023:10848000,2022:9979000,2021:9181000,2020:8447000,2019:7771000,2018:7150000,2017:6578000}},
+{marca:'TOYOTA',modelo:'CAMRY V6 3.5',tipo:'SEDAN 4 PUERTAS',precios:{'0Km':51300000,2025:47196000,2024:43420100,2023:39946500,2022:36751100,2021:33810800,2020:31105400,2019:28617300,2018:26327700,2017:24221700}},
+{marca:'TOYOTA',modelo:'CAMRY V6 XLE',tipo:'SEDAN 4 PUERTAS',precios:{2019:9084000,2018:8358000,2017:7689000,2016:7074000,2015:6508000}},
+{marca:'TOYOTA',modelo:'CAMRY XLE',tipo:'SEDAN 4 PUERTAS',precios:{'0Km':13931000,2025:12816000,2024:11790000,2023:10848000,2022:9979000,2021:9181000,2020:8447000,2019:7771000,2018:7150000,2017:6578000}},
+{marca:'TOYOTA',modelo:'CAMRY XLE SE',tipo:'SEDAN 4 PUERTAS',precios:{2002:4781000}},
+{marca:'TOYOTA',modelo:'C-HR HEV 1.8 ECVT',tipo:'RURAL 5 PUERTAS',precios:{'0Km':73629000,2025:69947600,2024:66449700,2023:63127400,2022:59971100}},
+{marca:'TOYOTA',modelo:'C-HR HV 1.8 ECVT',tipo:'RURAL 5 PUERTAS',precios:{'0Km':73629000,2025:69947600,2024:66449700,2023:63127400,2022:59971100}},
+{marca:'TOYOTA',modelo:'COROLLA',tipo:'SEDAN 4 PUERTAS',precios:{'0Km':10145000,2025:9637000,2024:9156000,2023:8698000,2022:8263000,2021:7850000,2020:7457000,2019:6376000,2018:6057000,2017:5754000,2016:5467000,2015:5193000,2014:4934000,2013:4687000}},
+{marca:'TOYOTA',modelo:'COROLLA',tipo:'SEDAN 5 PUERTAS',precios:{2019:4353000,2018:4135000,2017:3928000,2016:3732000,2015:3545000,2014:3368000,2013:3200000,2012:3040000}},
+{marca:'TOYOTA',modelo:'COROLLA 1.6 XLI',tipo:'SEDAN 4 PUERTAS',precios:{2019:4353000,2018:4135000,2017:3928000,2016:3732000,2015:3545000,2014:3368000,2013:3200000,2012:3040000}},
+{marca:'TOYOTA',modelo:'COROLLA 1.8 SE-G',tipo:'SEDAN 4 PUERTAS',precios:{2021:5838000,2020:5546000,2019:5269000,2018:5005000,2017:4755000,2016:4517000,2015:4291000}},
+{marca:'TOYOTA',modelo:'COROLLA 1.8 XE I',tipo:'SEDAN 4 PUERTAS',precios:{'0Km':10145000,2025:9637000,2024:9156000,2023:8698000,2022:8263000,2021:7850000,2020:7457000,2019:6376000,2018:6057000,2017:5754000,2016:5467000,2015:5193000,2014:4934000,2013:4687000}},
+{marca:'TOYOTA',modelo:'COROLLA 2.0 SEG CVT',tipo:'SEDAN 4 PUERTAS',precios:{'0Km':47174000,2025:39839650,2024:32505300,2023:31282400,2022:29718200,2021:28232400,2020:26820700,2019:25479700}},
+{marca:'TOYOTA',modelo:'COROLLA 2.0 SEG CVT MY21',tipo:'SEDAN 4 PUERTAS',precios:{2022:29718200,2021:28232400,2020:26820700,2019:25479700,2018:24205700}},
+{marca:'TOYOTA',modelo:'COROLLA 2.0 SEG CVT PIO',tipo:'SEDAN 4 PUERTAS',precios:{'0Km':47174000,2025:39839650,2024:32505300,2023:31282400,2022:29718200,2021:28232400,2020:26820700,2019:25479700}},
+{marca:'TOYOTA',modelo:'COROLLA 2.0 SEG SAFETY CVT',tipo:'SEDAN 4 PUERTAS',precios:{'0Km':47174000,2025:39839650,2024:32505300,2023:31282400,2022:29718200,2021:28232400,2020:26820700,2019:25479700}},
+{marca:'TOYOTA',modelo:'COROLLA 2.0 XEI CVT',tipo:'SEDAN 4 PUERTAS',precios:{'0Km':41987000,2025:35472350,2024:28957700,2023:27948400,2022:26551100,2021:25223500,2020:23962300}},
+{marca:'TOYOTA',modelo:'COROLLA 2.0 XEI CVT MY21',tipo:'SEDAN 4 PUERTAS',precios:{2022:26551100,2021:25223500,2020:23962300,2019:22764200}},
+{marca:'TOYOTA',modelo:'COROLLA 2.0 XEI CVT PIO',tipo:'SEDAN 4 PUERTAS',precios:{'0Km':38271000,2025:32333000,2024:26395000,2023:25475000,2022:24201000,2021:22991000,2020:21841000}},
+{marca:'TOYOTA',modelo:'COROLLA 2.0 XEI MT',tipo:'SEDAN 4 PUERTAS',precios:{2023:26020700,2022:24719700,2021:23483600,2020:22309500}},
+{marca:'TOYOTA',modelo:'COROLLA 2.0 XEI MT MY21',tipo:'SEDAN 4 PUERTAS',precios:{2023:26020700,2022:24719700,2021:23483600,2020:22309500}},
+{marca:'TOYOTA',modelo:'COROLLA 2.0 XEI SAFETY CVT',tipo:'SEDAN 4 PUERTAS',precios:{'0Km':41987000,2025:35472350,2024:28957700,2023:27948400,2022:26551100,2021:25223500,2020:23962300}},
+{marca:'TOYOTA',modelo:'COROLLA 2.0 XLI CVT',tipo:'SEDAN 4 PUERTAS',precios:{'0Km':36413000,2025:30905500,2024:25398000,2023:24556000,2022:23328000,2021:22162000,2020:21053000}},
+{marca:'TOYOTA',modelo:'COROLLA 2.0 XLI CVT MY21',tipo:'SEDAN 4 PUERTAS',precios:{2023:24260000,2022:23047000,2021:21894000,2020:20800000}},
+{marca:'TOYOTA',modelo:'COROLLA 2.0 XLI CVT PIO',tipo:'SEDAN 4 PUERTAS',precios:{'0Km':30952000,2025:26270500,2024:21589000,2023:20873000,2022:19829000,2021:18838000,2020:17896000}},
+{marca:'TOYOTA',modelo:'COROLLA 2.0 XLI MT',tipo:'SEDAN 4 PUERTAS',precios:{2023:22642000,2022:21510000,2021:20435000,2020:19413000}},
+{marca:'TOYOTA',modelo:'COROLLA 2.0 XLI MT MY21',tipo:'SEDAN 4 PUERTAS',precios:{2023:22642000,2022:21510000,2021:20435000,2020:19413000}},
+{marca:'TOYOTA',modelo:'COROLLA 2.0 XLI MT PIO',tipo:'SEDAN 4 PUERTAS',precios:{2023:22642000,2022:21510000,2021:20435000,2020:19413000}},
+{marca:'TOYOTA',modelo:'COROLLA 2.0 XLI SAFETY CVT',tipo:'SEDAN 4 PUERTAS',precios:{'0Km':38270000,2025:32481550,2024:26693100,2023:25808000,2022:24517600,2021:23291700,2020:22127100}},
+{marca:'TOYOTA',modelo:'COROLLA CE',tipo:'SEDAN 4 PUERTAS',precios:{2019:4353000,2018:4135000,2017:3928000,2016:3732000,2015:3545000,2014:3368000,2013:3200000,2012:3040000}},
+{marca:'TOYOTA',modelo:'COROLLA CROSS GR-SPORT 2.0 CVT',tipo:'RURAL 5 PUERTAS',precios:{'0Km':55054000,2025:46812500,2024:38571000,2023:37228000,2022:35367000}},
+{marca:'TOYOTA',modelo:'COROLLA CROSS GR-SPORT 2.0 CVT PIO',tipo:'RURAL 5 PUERTAS',precios:{2024:38715800,2023:36780000}},
+{marca:'TOYOTA',modelo:'COROLLA CROSS GR-SPORT SAFETY 2.0 CVT',tipo:'RURAL 5 PUERTAS',precios:{'0Km':57254000,2025:48683300,2024:40112600,2023:38715800,2022:36780000}},
+{marca:'TOYOTA',modelo:'COROLLA CROSS SEG 2.0 CVT',tipo:'RURAL 5 PUERTAS',precios:{'0Km':52758000,2025:45134000,2024:37510000,2023:36203000,2022:34393000,2021:32673000}},
+{marca:'TOYOTA',modelo:'COROLLA CROSS SEG 2.0 CVT PIO',tipo:'RURAL 5 PUERTAS',precios:{2024:39585000,2023:37700000,2022:35815000,2021:34024200}},
+{marca:'TOYOTA',modelo:'COROLLA CROSS SEG HEV 1.8 ECVT',tipo:'RURAL 5 PUERTAS',precios:{'0Km':55748000,2025:47428500,2024:39109000,2023:36300000,2022:35003000}},
+{marca:'TOYOTA',modelo:'COROLLA CROSS SEG HEV 1.8 ECVT PIO',tipo:'RURAL 5 PUERTAS',precios:{2024:37128000,2023:35802000}},
+{marca:'TOYOTA',modelo:'COROLLA CROSS SEG HEV SAFETY 1.8 ECVT',tipo:'RURAL 5 PUERTAS',precios:{'0Km':57020000,2025:48510900,2024:40001800,2023:37128000,2022:35802000}},
+{marca:'TOYOTA',modelo:'COROLLA CROSS SEG HV 1.8 ECVT',tipo:'RURAL 5 PUERTAS',precios:{2023:34476000,2022:33150000}},
+{marca:'TOYOTA',modelo:'COROLLA CROSS SEG LE HV 1.8 ECVT',tipo:'RURAL 5 PUERTAS',precios:{2023:34476000,2022:33150000}},
+{marca:'TOYOTA',modelo:'COROLLA CROSS SEG SAFETY 2.0 CVT',tipo:'RURAL 5 PUERTAS',precios:{'0Km':54939000,2025:46999700,2024:39060400,2023:37700000,2022:35815000,2021:34024200}},
+{marca:'TOYOTA',modelo:'COROLLA CROSS XEI 2.0 CVT',tipo:'RURAL 5 PUERTAS',precios:{'0Km':49739000,2025:43274100,2024:36809200,2023:35528000,2022:33751600,2021:32064000}},
+{marca:'TOYOTA',modelo:'COROLLA CROSS XEI 2.0 CVT PIO',tipo:'RURAL 5 PUERTAS',precios:{2023:35528000,2022:33751600,2021:32064000}},
+{marca:'TOYOTA',modelo:'COROLLA CROSS XEI HEV 1.8 ECVT',tipo:'RURAL 5 PUERTAS',precios:{'0Km':51453000,2025:44628050,2024:37803100,2023:35802000,2022:34476000}},
+{marca:'TOYOTA',modelo:'COROLLA CROSS XEI HEV 1.8 ECVT PIO',tipo:'RURAL 5 PUERTAS',precios:{2023:35802000,2022:34476000}},
+{marca:'TOYOTA',modelo:'COROLLA CROSS XEI HEV SAFETY 1.8 ECVT',tipo:'RURAL 5 PUERTAS',precios:{'0Km':51453000,2025:44628050,2024:37803100,2023:35802000,2022:34476000}},
+{marca:'TOYOTA',modelo:'COROLLA CROSS XEI HV 1.8 ECVT',tipo:'RURAL 5 PUERTAS',precios:{2023:33150000,2022:31824000}},
+{marca:'TOYOTA',modelo:'COROLLA CROSS XEI SAFETY 2.0 CVT',tipo:'RURAL 5 PUERTAS',precios:{'0Km':49739000,2025:43274100,2024:36809200,2023:35528000,2022:33751600,2021:32064000}},
+{marca:'TOYOTA',modelo:'COROLLA CROSS XLI 2.0 CVT',tipo:'RURAL 5 PUERTAS',precios:{'0Km':46161000,2025:40423950,2024:34686900,2023:33480100,2022:31806100,2021:30215800}},
+{marca:'TOYOTA',modelo:'COROLLA CROSS XLI 2.0 CVT PIO',tipo:'RURAL 5 PUERTAS',precios:{2023:33480100,2022:31806100,2021:30215800}},
+{marca:'TOYOTA',modelo:'COROLLA CROSS XLI SAFETY 2.0 CVT',tipo:'RURAL 5 PUERTAS',precios:{'0Km':46161000,2025:40423950,2024:34686900,2023:33480100,2022:31806100,2021:30215800}},
+{marca:'TOYOTA',modelo:'COROLLA DIESEL',tipo:'RURAL 5 PUERTAS',precios:{2018:4711000,2017:4476000,2016:4252000,2015:4040000,2014:3838000,2013:3646000,2012:3463000}},
+{marca:'TOYOTA',modelo:'COROLLA DX',tipo:'RURAL 5 PUERTAS',precios:{2019:4353000,2018:4135000,2017:3928000,2016:3732000,2015:3545000,2014:3368000,2013:3200000,2012:3040000}},
+{marca:'TOYOTA',modelo:'COROLLA FIELDER',tipo:'RURAL 5 PUERTAS',precios:{2022:6032000,2021:5744000,2020:5457000,2019:5184000,2018:4925000,2017:4679000,2016:4445000}},
+{marca:'TOYOTA',modelo:'COROLLA FIELDER SE-G A/T',tipo:'RURAL 5 PUERTAS',precios:{2022:8509000,2021:7699000,2020:7314000}},
+{marca:'TOYOTA',modelo:'COROLLA FIELDER XEI',tipo:'RURAL 5 PUERTAS',precios:{2022:6032000,2021:5744000,2020:5457000,2019:5184000,2018:4925000,2017:4679000,2016:4445000}},
+{marca:'TOYOTA',modelo:'COROLLA GR-S 2.0 CVT',tipo:'SEDAN 4 PUERTAS',precios:{2024:30022100,2023:28521000,2022:27094900}},
+{marca:'TOYOTA',modelo:'COROLLA GR-SPORT 2.0 CVT',tipo:'SEDAN 4 PUERTAS',precios:{'0Km':48314000,2025:40575800,2024:32837600,2023:31602200,2022:30022100,2021:28521000}},
+{marca:'TOYOTA',modelo:'COROLLA GR-SPORT 2.0 CVT PIO',tipo:'SEDAN 4 PUERTAS',precios:{'0Km':47120000,2025:39573000,2024:32026000,2023:30821000,2022:29280000,2021:27816000}},
+{marca:'TOYOTA',modelo:'COROLLA GR-SPORT SAFETY 2.0 CVT',tipo:'SEDAN 4 PUERTAS',precios:{'0Km':48314000,2025:40575800,2024:32837600,2023:31602200,2022:30022100,2021:28521000}},
+{marca:'TOYOTA',modelo:'COROLLA HEV 1.8 SEG ECVT',tipo:'SEDAN 4 PUERTAS',precios:{'0Km':49434000,2025:41768300,2024:34102600,2023:32820400,2022:31179400,2021:29620400,2020:28139400,2019:26732500}},
+{marca:'TOYOTA',modelo:'COROLLA HEV 1.8 SEG ECVT PIO',tipo:'SEDAN 4 PUERTAS',precios:{'0Km':49434000,2025:41768300,2024:34102600,2023:32820400,2022:31179400,2021:29620400,2020:28139400,2019:26732500}},
+{marca:'TOYOTA',modelo:'COROLLA HEV 1.8 SEG SAFETY ECVT',tipo:'SEDAN 4 PUERTAS',precios:{'0Km':44645000,2025:37809950,2024:30974900,2023:29896200,2022:28401300,2021:26981200,2020:25632200}},
+{marca:'TOYOTA',modelo:'COROLLA HEV 1.8 XEI ECVT',tipo:'SEDAN 4 PUERTAS',precios:{'0Km':44645000,2025:37809950,2024:30974900,2023:29896200,2022:28401300,2021:26981200,2020:25632200}},
+{marca:'TOYOTA',modelo:'COROLLA HEV 1.8 XEI ECVT PIO',tipo:'SEDAN 4 PUERTAS',precios:{2022:28401300,2021:26981200,2020:25632200,2019:24350600}},
+{marca:'TOYOTA',modelo:'COROLLA HEV 1.8 XEI SAFETY ECVT',tipo:'SEDAN 4 PUERTAS',precios:{'0Km':44645000,2025:37809950,2024:30974900,2023:29896200,2022:28401300,2021:26981200,2020:25632200}},
+{marca:'TOYOTA',modelo:'COROLLA HV 1.8 SEG ECVT',tipo:'SEDAN 4 PUERTAS',precios:{'0Km':49434000,2025:41768300,2024:34102600,2023:32820400,2022:31179400,2021:29620400,2020:28139400,2019:26732500}},
+{marca:'TOYOTA',modelo:'COROLLA HV 1.8 SEG ECVT MY21',tipo:'SEDAN 4 PUERTAS',precios:{2022:31179400,2021:29620400,2020:28139400,2019:26732500,2018:25395800}},
+{marca:'TOYOTA',modelo:'COROLLA HV 1.8 XEI ECVT',tipo:'SEDAN 4 PUERTAS',precios:{'0Km':44645000,2025:37809950,2024:30974900,2023:29896200,2022:28401300,2021:26981200,2020:25632200}},
+{marca:'TOYOTA',modelo:'COROLLA HV 1.8 XEI ECVT MY21',tipo:'SEDAN 4 PUERTAS',precios:{2022:28401300,2021:26981200,2020:25632200,2019:24350600}},
+{marca:'TOYOTA',modelo:'COROLLA S',tipo:'SEDAN 4 PUERTAS',precios:{2019:14157000,2018:13449000,2017:12777000,2016:12138000}},
+{marca:'TOYOTA',modelo:'COROLLA S 1.8 M/T',tipo:'SEDAN 4 PUERTAS',precios:{2017:7268000,2016:6904000}},
+{marca:'TOYOTA',modelo:'COROLLA SE-G',tipo:'SEDAN 4 PUERTAS',precios:{2021:5838000,2020:5546000,2019:5269000,2018:5005000,2017:4755000,2016:4517000,2015:4291000}},
+{marca:'TOYOTA',modelo:'COROLLA SE-G 1.8 6M/T',tipo:'SEDAN 4 PUERTAS',precios:{2020:23237400,2019:22075600,2018:20971800,2017:19923200,2016:18927100,2015:17980700}},
+{marca:'TOYOTA',modelo:'COROLLA SE-G 1.8 A/T',tipo:'SEDAN 4 PUERTAS',precios:{2022:14265000,2021:13552000,2020:12874000,2019:12230000,2018:11619000,2017:11038000,2016:10486000}},
+{marca:'TOYOTA',modelo:'COROLLA SE-G 1.8 CVT',tipo:'SEDAN 4 PUERTAS',precios:{2020:22995400,2019:21845600,2018:20753300,2017:19715700,2016:18729900,2015:17793400}},
+{marca:'TOYOTA',modelo:'COROLLA SE-G 1.8 M/T',tipo:'SEDAN 4 PUERTAS',precios:{2019:14157000,2018:13449000,2017:12777000,2016:12138000}},
+{marca:'TOYOTA',modelo:'COROLLA SEG HEV 1.8 ECVT',tipo:'SEDAN 4 PUERTAS',precios:{'0Km':49434000,2025:41768300,2024:34102600,2023:32820400,2022:31179400,2021:29620400,2020:28139400,2019:26732500}},
+{marca:'TOYOTA',modelo:'COROLLA VERSO',tipo:'RURAL 5 PUERTAS',precios:{2021:5207000,2020:4947000,2019:4699000,2018:4464000,2017:4241000,2016:4029000,2015:3828000}},
+{marca:'TOYOTA',modelo:'COROLLA XEI',tipo:'SEDAN 4 PUERTAS',precios:{'0Km':10145000,2025:9637000,2024:9156000,2023:8698000,2022:8263000,2021:7850000,2020:7457000,2019:6376000,2018:6057000,2017:5754000,2016:5467000,2015:5193000,2014:4934000,2013:4687000}},
+{marca:'TOYOTA',modelo:'COROLLA XEI 1.8 6M/T',tipo:'SEDAN 4 PUERTAS',precios:{2021:19914400,2020:18918700,2019:17972800,2018:17074100,2017:16220500,2016:15409400}},
+{marca:'TOYOTA',modelo:'COROLLA XEI 1.8 A/T',tipo:'SEDAN 4 PUERTAS',precios:{2022:11976000,2021:11377000,2020:10808000,2019:10268000,2018:9754000,2017:9267000,2016:8803000}},
+{marca:'TOYOTA',modelo:'COROLLA XEI 1.8 CVT',tipo:'SEDAN 4 PUERTAS',precios:{2022:22060000,2021:20957000,2020:19909000,2019:18914000,2018:17968000,2017:17070000}},
+{marca:'TOYOTA',modelo:'COROLLA XEI 1.8 M/T',tipo:'SEDAN 4 PUERTAS',precios:{'0Km':10145000,2025:9637000,2024:9156000,2023:8698000,2022:8263000,2021:7850000,2020:7457000,2019:6376000,2018:6057000,2017:5754000,2016:5467000,2015:5193000,2014:4934000,2013:4687000}},
+{marca:'TOYOTA',modelo:'COROLLA XEI 2.0TD',tipo:'SEDAN 4 PUERTAS',precios:{2018:4711000,2017:4476000,2016:4252000,2015:4040000,2014:3838000,2013:3646000,2012:3463000}},
+{marca:'TOYOTA',modelo:'COROLLA XEI HEV 1.8 ECVT',tipo:'SEDAN 4 PUERTAS',precios:{'0Km':44645000,2025:37809950,2024:30974900,2023:29896200,2022:28401300,2021:26981200,2020:25632200}},
+{marca:'TOYOTA',modelo:'COROLLA XEI PACK 1.8 6M/T',tipo:'SEDAN 4 PUERTAS',precios:{2020:20312700,2019:19297100,2018:18332200,2017:17415600,2016:16544800,2015:15717600}},
+{marca:'TOYOTA',modelo:'COROLLA XEI PACK 1.8 A/T',tipo:'SEDAN 4 PUERTAS',precios:{2022:12339000,2021:11722000,2020:11136000,2019:10579000,2018:10050000,2017:9547000,2016:9070000}},
+{marca:'TOYOTA',modelo:'COROLLA XEI PACK 1.8 CVT',tipo:'SEDAN 4 PUERTAS',precios:{2022:22722300,2021:21586200,2020:20506900,2019:19481600,2018:18507500,2017:17582100}},
+{marca:'TOYOTA',modelo:'COROLLA XEI PACK 1.8 M/T',tipo:'SEDAN 4 PUERTAS',precios:{2022:11412000,2021:10841000,2020:10299000,2019:9784000,2018:9295000,2017:8830000,2016:8389000}},
+{marca:'TOYOTA',modelo:'COROLLA XL',tipo:'RURAL 5 PUERTAS',precios:{2019:4353000,2018:4135000,2017:3928000,2016:3732000,2015:3545000,2014:3368000,2013:3200000,2012:3040000}},
+{marca:'TOYOTA',modelo:'COROLLA XLI',tipo:'SEDAN 4 PUERTAS',precios:{2019:4353000,2018:4135000,2017:3928000,2016:3732000,2015:3545000,2014:3368000,2013:3200000,2012:3040000}},
+{marca:'TOYOTA',modelo:'COROLLA XLI 1.8 6M/T',tipo:'SEDAN 4 PUERTAS',precios:{2021:18555600,2020:17627800,2019:16746400,2018:15909100,2017:15113600,2016:14357900,2015:13640000}},
+{marca:'TOYOTA',modelo:'COROLLA XLI 1.8 CVT',tipo:'SEDAN 4 PUERTAS',precios:{2021:18588000,2020:17658000,2019:16775000,2018:15937000,2017:15140000,2016:14383000}},
+{marca:'TOYOTA',modelo:'COROLLA XLI 1.8 M/T',tipo:'SEDAN 4 PUERTAS',precios:{2022:9376000,2021:8907000,2020:8462000,2019:8039000,2018:7637000,2017:7255000,2016:6892000}},
+{marca:'TOYOTA',modelo:'COROLLA XRS',tipo:'SEDAN 4 PUERTAS',precios:{2022:12439000,2021:11817000,2020:11227000}},
+{marca:'TOYOTA',modelo:'CORONA',tipo:'RURAL 5 PUERTAS',precios:{2003:1478700,2002:1408300}},
+{marca:'TOYOTA',modelo:'CORONA',tipo:'SEDAN 4 PUERTAS',precios:{2003:1478700,2002:1408300}},
+{marca:'TOYOTA',modelo:'CORONA 2.0',tipo:'SEDAN 4 PUERTAS',precios:{2003:1478700,2002:1408300}},
+{marca:'TOYOTA',modelo:'CORONA 2.0 TD',tipo:'SEDAN 4 PUERTAS',precios:{2003:1830700,2002:1689900}},
+{marca:'TOYOTA',modelo:'CORONA AVENSIS 2.0',tipo:'SEDAN 4 PUERTAS',precios:{2003:1478700,2002:1408300}},
+{marca:'TOYOTA',modelo:'CORONA D 4D',tipo:'SEDAN 4 PUERTAS',precios:{2003:1830700,2002:1689900}},
+{marca:'TOYOTA',modelo:'CORONA GL 1.6',tipo:'SEDAN 4 PUERTAS',precios:{2003:1478700,2002:1408300}},
+{marca:'TOYOTA',modelo:'CORONA GLD 2.0',tipo:'SEDAN 4 PUERTAS',precios:{2003:1478700,2002:1408300}},
+{marca:'TOYOTA',modelo:'CORONA GLI 2.0',tipo:'SEDAN 4 PUERTAS',precios:{2003:1478700,2002:1408300}},
+{marca:'TOYOTA',modelo:'CORONA XL',tipo:'SEDAN 4 PUERTAS',precios:{2003:1478700,2002:1408300}},
+{marca:'TOYOTA',modelo:'CROWN HEV 2.4T 4WD 6AT',tipo:'SEDAN 4 PUERTAS',precios:{'0Km':101250000,2025:96525000,2024:91800000}},
+{marca:'TOYOTA',modelo:'ETIOS AIBO 1.5 6M/T',tipo:'UTILITARIO',precios:{2024:15419000,2023:14685000,2022:13951000}},
+{marca:'TOYOTA',modelo:'ETIOS CROSS 1.5 4A/T',tipo:'SEDAN 5 PUERTAS',precios:{2024:12431000,2023:11809000,2022:11219000}},
+{marca:'TOYOTA',modelo:'ETIOS CROSS 1.5 6M/T',tipo:'SEDAN 5 PUERTAS',precios:{2024:12029000,2023:11427000,2022:10856000}},
+{marca:'TOYOTA',modelo:'ETIOS CROSS 1.5 M/T',tipo:'SEDAN 5 PUERTAS',precios:{2024:11350000,2023:10782000,2022:10243000,2021:9731000,2020:9245000}},
+{marca:'TOYOTA',modelo:'ETIOS PLATINUM 1.5 4A/T',tipo:'SEDAN 4 PUERTAS',precios:{2024:15067000,2023:14314000,2022:12303000}},
+{marca:'TOYOTA',modelo:'ETIOS PLATINUM 1.5 4A/T',tipo:'SEDAN 5 PUERTAS',precios:{2024:14613000,2023:13883000,2022:13189000}},
+{marca:'TOYOTA',modelo:'ETIOS PLATINUM 1.5 6M/T',tipo:'SEDAN 4 PUERTAS',precios:{2024:12943000,2023:12296000,2022:11681000}},
+{marca:'TOYOTA',modelo:'ETIOS PLATINUM 1.5 6M/T',tipo:'SEDAN 5 PUERTAS',precios:{2024:13918000,2023:13222000,2022:12561000}},
+{marca:'TOYOTA',modelo:'ETIOS PLATINUM 1.5 M/T',tipo:'SEDAN 4 PUERTAS',precios:{2023:12731000,2022:12095000}},
+{marca:'TOYOTA',modelo:'ETIOS PLATINUM 1.5 M/T',tipo:'SEDAN 5 PUERTAS',precios:{2023:12593000,2022:11964000}},
+{marca:'TOYOTA',modelo:'ETIOS X 1.5 6M/T',tipo:'SEDAN 4 PUERTAS',precios:{2025:15405000,2024:14671000,2023:13938000,2022:13241000,2021:12579000,2020:11950000,2019:11352000,2018:10785000,2017:10245000}},
+{marca:'TOYOTA',modelo:'ETIOS X 1.5 6M/T',tipo:'SEDAN 5 PUERTAS',precios:{2025:14773000,2024:14070000,2023:13366000,2022:12698000,2021:12063000,2020:11460000,2019:10887000,2018:10343000,2017:9825000}},
+{marca:'TOYOTA',modelo:'ETIOS X 1.5 M/T',tipo:'SEDAN 4 PUERTAS',precios:{2023:10817000,2022:10276000,2021:9762000,2020:9274000}},
+{marca:'TOYOTA',modelo:'ETIOS X 1.5 M/T',tipo:'SEDAN 5 PUERTAS',precios:{2023:11147600,2022:10590100,2021:10060600,2020:9557600}},
+{marca:'TOYOTA',modelo:'ETIOS XLS 1.5 4A/T',tipo:'SEDAN 4 PUERTAS',precios:{2025:18194000,2024:17284000,2023:16420000,2022:15599000,2021:14819000,2020:14078000,2019:13374000}},
+{marca:'TOYOTA',modelo:'ETIOS XLS 1.5 4A/T',tipo:'SEDAN 5 PUERTAS',precios:{2025:18564000,2024:17635800,2023:16754000,2022:15916300,2021:15120500,2020:14364500,2019:13646300}},
+{marca:'TOYOTA',modelo:'ETIOS XLS 1.5 6M/T',tipo:'SEDAN 4 PUERTAS',precios:{2025:17613000,2024:16733000,2023:15896000,2022:15101000,2021:14346000,2020:13629000,2019:12948000}},
+{marca:'TOYOTA',modelo:'ETIOS XLS 1.5 6M/T',tipo:'SEDAN 5 PUERTAS',precios:{2025:17768400,2024:16880000,2023:16036000,2022:15234200,2021:14472400,2020:13748800,2019:13061400}},
+{marca:'TOYOTA',modelo:'ETIOS XLS 1.5 M/T',tipo:'SEDAN 4 PUERTAS',precios:{2023:12516000,2022:11890000,2021:11296000,2020:10731000}},
+{marca:'TOYOTA',modelo:'ETIOS XLS 1.5 M/T',tipo:'SEDAN 5 PUERTAS',precios:{2023:12746000,2022:12109000,2021:11503000,2020:10928000}},
+{marca:'TOYOTA',modelo:'ETIOS XLS PACK 1.5 4A/T',tipo:'SEDAN 4 PUERTAS',precios:{2025:20879000,2024:19885000,2023:18891000,2022:15675000}},
+{marca:'TOYOTA',modelo:'ETIOS XLS PACK 1.5 4A/T',tipo:'SEDAN 5 PUERTAS',precios:{2025:20798000,2024:19807000,2023:18817000,2022:16043000}},
+{marca:'TOYOTA',modelo:'ETIOS XLS PACK 1.5 6M/T',tipo:'SEDAN 4 PUERTAS',precios:{2025:19061000,2024:18154000,2023:17246000,2022:16384000}},
+{marca:'TOYOTA',modelo:'ETIOS XLS PACK 1.5 6M/T',tipo:'SEDAN 5 PUERTAS',precios:{2025:19243000,2024:18327000,2023:17410000,2022:16540000}},
+{marca:'TOYOTA',modelo:'ETIOS XS 1.5 6M/T',tipo:'SEDAN 4 PUERTAS',precios:{2025:17613000,2024:16733000,2023:15896000,2022:15101000,2021:14346000,2020:13629000,2019:12948000}},
+{marca:'TOYOTA',modelo:'ETIOS XS 1.5 6M/T',tipo:'SEDAN 5 PUERTAS',precios:{2024:13366100,2023:12697800,2022:12062900}},
+{marca:'TOYOTA',modelo:'ETIOS XS 1.5 M/T',tipo:'SEDAN 4 PUERTAS',precios:{2023:11912000,2022:11316000,2021:10750000,2020:10213000}},
+{marca:'TOYOTA',modelo:'ETIOS XS 1.5 M/T',tipo:'SEDAN 5 PUERTAS',precios:{2023:10856600,2022:10313800,2021:9798000}},
+{marca:'TOYOTA',modelo:'FJ CRUISER',tipo:'TODO TERRENO',precios:{2024:22869100,2023:22052300,2022:21133000}},
+{marca:'TOYOTA',modelo:'FORTUNER',tipo:'TODO TERRENO',precios:{2025:33063900,2024:31605200,2023:30632700,2022:29660200,2021:28687800,2020:28201600,2019:27229100,2018:26256600,2017:25284200,2016:24311700,2015:23825500}},
+{marca:'TOYOTA',modelo:'GR 86 MT',tipo:'COUPE',precios:{'0Km':82215000,2025:76882500,2024:71550000,2023:64800000}},
+{marca:'TOYOTA',modelo:'GR COROLLA HB',tipo:'SEDAN 5 PUERTAS',precios:{'0Km':47120000,2025:39573000,2024:32026000,2023:30821000,2022:29280000,2021:27816000}},
+{marca:'TOYOTA',modelo:'GR YARIS',tipo:'SEDAN 3 PUERTAS',precios:{'0Km':85050000,2025:81000000,2024:76950000}},
+{marca:'TOYOTA',modelo:'GR YARIS AT',tipo:'SEDAN 3 PUERTAS',precios:{'0Km':96930000,2025:87237000}},
+{marca:'TOYOTA',modelo:'GR YARIS MT',tipo:'SEDAN 3 PUERTAS',precios:{'0Km':94500000,2025:85050000}},
+{marca:'TOYOTA',modelo:'HIACE COMMUTER 2.8 TDI 6AT 14A',tipo:'MINIBUS',precios:{'0Km':77175000,2025:65734850,2024:54294700}},
+{marca:'TOYOTA',modelo:'HIACE COMMUTER 2.8 TDI 6AT 14A',tipo:'TRANS. DE PASAJEROS',precios:{'0Km':68985000,2025:64800000,2024:60075000,2023:55485000}},
+{marca:'TOYOTA',modelo:'HIACE FURGON L2H2 2.8 TDI 6AT 3A',tipo:'FURGON',precios:{'0Km':63836000,2025:54373000,2024:44910000}},
+{marca:'TOYOTA',modelo:'HIACE L1H1 2.8 TDI 6AT 3A',tipo:'FURGON',precios:{2025:52227000,2024:50348500,2023:48470000,2022:45077000,2021:41927000,2020:38897000,2019:36232000,2018:31869000}},
+{marca:'TOYOTA',modelo:'HIACE L2H2 2.8 TDI 6AT 3A',tipo:'FURGON',precios:{2025:53148000,2024:49369000,2023:46599000,2022:43324000,2021:40302000,2020:36523000}},
+{marca:'TOYOTA',modelo:'HIACE WAGON 2.8 TDI 6AT 10A',tipo:'TRANS. DE PASAJEROS',precios:{'0Km':94567500,2025:91158750,2024:87750000,2023:81000000,2022:75600000,2021:70200000}},
+{marca:'TOYOTA',modelo:'HIGHLANDER',tipo:'RURAL 5 PUERTAS',precios:{2018:11205000,2017:10644800,2016:10112900,2015:9606600}},
+{marca:'TOYOTA',modelo:'HIGHLANDER',tipo:'TODO TERRENO',precios:{2018:11475000,2017:10901300,2016:10355900,2015:9838800}},
+{marca:'TOYOTA',modelo:'HILUX',tipo:'PICK-UP',precios:{2025:10555900,2024:10053300,2023:9574600,2022:9073900,2021:8641800}},
+{marca:'TOYOTA',modelo:'HILUX 2.4 TD 4WD (CABINA DOBLE)',tipo:'PICK-UP',precios:{2025:10555900,2024:10053300,2023:9574600,2022:9073900,2021:8641800}},
+{marca:'TOYOTA',modelo:'HILUX 2.8 D 4X4 (CABINA DOBLE)',tipo:'PICK-UP',precios:{2025:10555900,2024:10053300,2023:9574600,2022:9073900,2021:8641800}},
+{marca:'TOYOTA',modelo:'HILUX 2700 EFI',tipo:'PICK-UP CABINA DOBLE',precios:{2019:5396800,2018:5126900,2017:4846700,2016:4604400}},
+{marca:'TOYOTA',modelo:'HILUX 4X2 C/D DX PACK 2.5 TDI',tipo:'PICK-UP',precios:{2021:18711900,2020:17968500,2019:17560200,2018:17068900,2017:16581200,2016:16096300,2015:12699100,2014:12294700,2013:11971100,2012:11590800,2011:11268800}},
+{marca:'TOYOTA',modelo:'HILUX 4X2 C/D SR 3.0 TDI',tipo:'PICK-UP',precios:{2025:22052300,2024:21235600,2023:20320100,2022:19507400,2021:17390500,2020:16824300,2019:16419800,2018:15772700,2017:14890900,2016:14086000,2015:13381700,2014:12712600,2013:12017800,2012:11416900}},
+{marca:'TOYOTA',modelo:'HILUX 4X2 C/D SRV 3.0 TDI',tipo:'PICK-UP',precios:{2025:22869100,2024:22052300,2023:21133000,2022:20320100,2021:18199400,2020:17633200,2019:17228700,2018:16581700,2017:15695900,2016:14890900,2015:14146400}},
+{marca:'TOYOTA',modelo:'HILUX 4X2 D/C SR 2.4 TDI 6 M/T',tipo:'PICK-UP',precios:{2025:28863400,2024:27569300,2023:26177500,2022:25371100,2021:23616600,2020:22831800,2019:22181000}},
+{marca:'TOYOTA',modelo:'HILUX 4X2 D/C SRV 2.8 TDI 6 A/T',tipo:'PICK-UP',precios:{2025:35755600,2024:34362300,2023:32840900,2022:31511400,2021:29289700}},
+{marca:'TOYOTA',modelo:'HILUX 4X2 D/C SRV 2.8 TDI 6 M/T',tipo:'PICK-UP',precios:{2025:34010100,2024:32642100,2023:31153400,2022:29848300,2021:27734800,2020:26762500,2019:25801600}},
+{marca:'TOYOTA',modelo:'HILUX 4X2 D/C SRX 2.8 TDI 6 A/T',tipo:'PICK-UP',precios:{2025:38994000,2024:37384000,2023:35988600,2022:33618000}},
+{marca:'TOYOTA',modelo:'HILUX 4X2 DC DX 2.4 TDI 6 MT',tipo:'PICK-UP',precios:{'0Km':46768000,2025:41037500,2024:35307000,2023:33625000,2022:31944000,2021:30347000,2020:28830000}},
+{marca:'TOYOTA',modelo:'HILUX 4X2 DC SR 2.4 TDI 6 MT',tipo:'PICK-UP',precios:{'0Km':53511000,2025:46758000,2024:40005000,2023:38100000,2022:36195000,2021:34386000,2020:32666000}},
+{marca:'TOYOTA',modelo:'HILUX 4X2 DC SRV 2.8 TDI 6 AT',tipo:'PICK-UP',precios:{'0Km':64231000,2025:56600000,2024:48969000,2023:46637000,2022:44305000,2021:42090000,2020:39986000}},
+{marca:'TOYOTA',modelo:'HILUX 4X2 DC SRX 2.8 TDI 6 AT',tipo:'PICK-UP',precios:{'0Km':74519000,2025:64250600,2024:53982200,2023:51411700,2022:48841100,2021:46399100,2020:44079000}},
+{marca:'TOYOTA',modelo:'HILUX 4X4 C/D SR 3.0 TDI',tipo:'PICK-UP',precios:{2025:23685800,2024:22869100,2023:21945800,2022:21133000,2021:19008200,2020:18199400,2019:17592700,2018:16783800,2017:15293400,2016:14729900,2015:13993400,2014:13293800}},
+{marca:'TOYOTA',modelo:'HILUX 4X4 C/D SRV 3.0 TDI',tipo:'PICK-UP',precios:{2025:24502600,2024:23685800,2023:22758500,2022:21945800,2021:19574500,2020:18927400,2019:18361100,2018:17552300,2017:16661700,2016:15293400,2015:14528700,2014:13802300,2013:13047800}},
+{marca:'TOYOTA',modelo:'HILUX 4X4 D/C DX 2.4 TDI 6 M/T',tipo:'PICK-UP',precios:{2025:29356000,2024:28407400,2023:27345800,2022:26437100,2021:24793300,2020:24253500,2019:23720800}},
+{marca:'TOYOTA',modelo:'HILUX 4X4 D/C GR-S 2.8 TDI 6 A/T',tipo:'PICK-UP',precios:{'0Km':54366000,2025:50388000,2024:47736000,2023:45084000}},
+{marca:'TOYOTA',modelo:'HILUX 4X4 D/C SR 2.8 TDI 6 M/T',tipo:'PICK-UP',precios:{2025:34546800,2024:33568400,2023:32451400,2022:31554000,2021:29835900,2020:29271500,2019:28714700}},
+{marca:'TOYOTA',modelo:'HILUX 4X4 D/C SRV 2.8 TDI 6 A/T',tipo:'PICK-UP',precios:{2025:40141000,2024:39126300,2023:37946600,2022:36926700,2021:34878700,2020:34289500,2019:33292400}},
+{marca:'TOYOTA',modelo:'HILUX 4X4 D/C SRX 2.8 TDI 6 A/T',tipo:'PICK-UP',precios:{2025:48061600,2024:44728400,2023:41278200,2022:40252700,2021:38240500,2020:37634900,2019:36621600}},
+{marca:'TOYOTA',modelo:'HILUX 4X4 DC DX 2.4 TDI 6 MT',tipo:'PICK-UP',precios:{'0Km':54769000,2025:48058500,2024:41348000,2023:39379000,2022:37410000,2021:35540000,2020:33763000}},
+{marca:'TOYOTA',modelo:'HILUX 4X4 DC SR 2.8 TDI 6 MT',tipo:'PICK-UP',precios:{'0Km':63219000,2025:55830500,2024:48442000,2023:46135000,2022:43828000,2021:41637000,2020:39555000}},
+{marca:'TOYOTA',modelo:'HILUX 4X4 DC SRV 2.8 TDI 6 AT',tipo:'PICK-UP',precios:{'0Km':72925000,2025:64691500,2024:56458000,2023:53769000,2022:51081000,2021:48527000,2020:46100000}},
+{marca:'TOYOTA',modelo:'HILUX 4X4 DC SRX 2.8 TDI 6 AT',tipo:'PICK-UP',precios:{'0Km':80666000,2025:70262350,2024:59858700,2023:57008200,2022:54157800,2021:51449900,2020:48877400}},
+{marca:'TOYOTA',modelo:'HILUX 4X4 DC GR-SPORT IV 2.8 TDI 6 AT',tipo:'PICK-UP',precios:{'0Km':85343000,2025:76472350,2024:67601700,2023:64382400}},
+{marca:'TOYOTA',modelo:'HILUX SW4 4X2 SR 3.0 TDI',tipo:'PICK-UP',precios:{2025:32091400,2024:31118900,2023:30146500,2022:29174000,2021:28201600,2020:27715300,2019:26742800,2018:25770400,2017:24797900,2016:23825500,2015:22853000}},
+{marca:'TOYOTA',modelo:'HILUX SW4 4X4 SRV 3.0 TDI',tipo:'TODO TERRENO',precios:{2025:32091400,2024:31118900,2023:30146500,2022:29174000,2021:28201600,2020:27715300,2019:26742800,2018:25770400,2017:24797900,2016:23825500,2015:22853000}},
+{marca:'TOYOTA',modelo:'HILUX SW4 4X4 SRV 3.0 TDI A/T',tipo:'TODO TERRENO',precios:{2022:30146500,2021:29174000,2020:28201600,2019:27229100,2018:26256600,2017:25284200,2016:24311700,2015:23825500}},
+{marca:'TOYOTA',modelo:'HILUX SW4 4X4 SRV 3.0 TDI A/T C/CUERO',tipo:'TODO TERRENO',precios:{2025:32577600,2024:31605200,2023:30632700,2022:30146500,2021:29174000,2020:28201600,2019:27229100,2018:26256600,2017:25284200,2016:24311700}},
+{marca:'TOYOTA',modelo:'HILUX SW4 4X4 SRV 3.0 TDI C/CUERO',tipo:'TODO TERRENO',precios:{2025:33063900,2024:31605200,2023:30632700,2022:29660200,2021:28687800,2020:28201600,2019:27229100,2018:26256600,2017:25284200,2016:24311700,2015:23825500}},
+{marca:'TOYOTA',modelo:'INNOVA SR 2.7 NAFTA 6 A/T 8A',tipo:'RURAL 5 PUERTAS',precios:{2024:25091600,2023:22522100,2022:20201600,2021:18926400}},
+{marca:'TOYOTA',modelo:'INNOVA SRV 2.7 NAFTA 6 A/T 8A',tipo:'RURAL 5 PUERTAS',precios:{2024:26466500,2023:23938200,2022:21597200,2021:20301700}},
+{marca:'TOYOTA',modelo:'LAND CRUISER',tipo:'PICK-UP',precios:{2025:53940000,2024:48546000,2023:43152000,2022:37758000,2021:32364000,2020:29667000}},
+{marca:'TOYOTA',modelo:'LAND CRUISER',tipo:'RURAL 5 PUERTAS',precios:{2025:53940000,2024:48546000,2023:43152000,2022:37758000,2021:32364000,2020:29667000}},
+{marca:'TOYOTA',modelo:'LAND CRUISER',tipo:'TODO TERRENO',precios:{2025:53940000,2024:48546000,2023:43152000,2022:37758000,2021:32364000,2020:29667000}},
+{marca:'TOYOTA',modelo:'LAND CRUISER 200 VX',tipo:'TODO TERRENO',precios:{'0Km':195750000,2025:182250000,2024:168750000,2023:155250000,2022:141750000,2021:128250000,2020:121500000,2019:114750000,2018:108000000,2017:101250000,2016:94500000,2015:87750000,2014:74250000,2013:60750000}},
+{marca:'TOYOTA',modelo:'LAND CRUISER 300 GR-S',tipo:'TODO TERRENO',precios:{'0Km':243000000,2025:229500000,2024:216000000}},
+{marca:'TOYOTA',modelo:'LAND CRUISER 300 VX',tipo:'TODO TERRENO',precios:{'0Km':255555000,2025:229999500,2024:229500000,2023:216000000,2022:202500000}},
+{marca:'TOYOTA',modelo:'LAND CRUISER PRADO TXL AT',tipo:'TODO TERRENO',precios:{'0Km':114750000,2025:101250000,2024:87750000,2023:74250000,2022:60750000,2021:47250000,2020:33750000,2019:29700000,2018:27000000}},
+{marca:'TOYOTA',modelo:'LAND CRUISER PRADO VX A/T',tipo:'TODO TERRENO',precios:{'0Km':141750000,2025:128250000,2024:114750000,2023:101250000,2022:87750000,2021:81000000,2020:74250000,2019:67500000,2018:60750000,2017:54000000,2016:47250000,2015:43200000,2014:40500000,2013:37800000,2012:35100000}},
+{marca:'TOYOTA',modelo:'NEW RAV4 2.0',tipo:'TODO TERRENO',precios:{2025:23625000,2024:21262500,2023:19136300,2022:17223300,2021:15500700,2020:13950900}},
+{marca:'TOYOTA',modelo:'PRIUS 1.5 CVT',tipo:'SEDAN 5 PUERTAS',precios:{'0Km':23815100,2025:22680900,2024:21600900,2023:20572300,2022:19592700,2021:18659700,2020:17771100,2019:15638600,2018:13762000,2017:12110500,2016:10657300,2015:9378400,2014:8253000,2013:7262600}},
+{marca:'TOYOTA',modelo:'PRIUS 1.8 CVT',tipo:'SEDAN 5 PUERTAS',precios:{'0Km':23815100,2025:22680900,2024:21600900,2023:20572300,2022:19592700,2021:18659700,2020:17771100,2019:15638600,2018:13762000,2017:12110500,2016:10657300,2015:9378400,2014:8253000,2013:7262600}},
+{marca:'TOYOTA',modelo:'PRIUS HV 1.8 CVT',tipo:'SEDAN 5 PUERTAS',precios:{'0Km':23815100,2025:22680900,2024:21600900,2023:20572300,2022:19592700,2021:18659700,2020:17771100,2019:15638600,2018:13762000,2017:12110500,2016:10657300,2015:9378400,2014:8253000,2013:7262600}},
+{marca:'TOYOTA',modelo:'RAV 4',tipo:'RURAL 5 PUERTAS',precios:{'0Km':29700000,2025:26730000,2024:24057000,2023:21651300,2022:19485900,2021:17537900,2020:15784200,2019:14206100,2018:12784500,2017:11506100,2016:10931000,2015:10384200,2014:9865800,2013:9371700,2012:8903300,2011:8457800}},
+{marca:'TOYOTA',modelo:'RAV 4',tipo:'TODO TERRENO',precios:{2025:21687800,2024:20655000,2023:18589500,2022:16730600,2021:15057900,2020:13551300,2019:12195900,2018:11587100,2017:11007900,2016:10457100,2015:9934700,2014:9437900,2013:8965400}},
+{marca:'TOYOTA',modelo:'RAV4 4X2 CVT',tipo:'RURAL 5 PUERTAS',precios:{'0Km':34425000,2025:31725000,2024:29025000,2023:26325000,2022:23625000,2021:21600000,2020:19575000}},
+{marca:'TOYOTA',modelo:'RAV4 4X4 6A/T',tipo:'TODO TERRENO',precios:{'0Km':38475000,2025:35775000,2024:33075000,2023:30375000,2022:27675000,2021:25650000,2020:23625000}},
+{marca:'TOYOTA',modelo:'RAV4 HEV 2.5 AWD LIMITED CVT',tipo:'TODO TERRENO',precios:{'0Km':94770000,2025:85293000,2024:76384400,2023:71038400,2022:67485200,2021:64111500,2020:60906600}},
+{marca:'TOYOTA',modelo:'RAV4 HV 2.5 AWD LIMITED CVT',tipo:'TODO TERRENO',precios:{'0Km':94770000,2025:85293000,2024:76384400,2023:71038400,2022:67485200,2021:64111500,2020:60906600}},
+{marca:'TOYOTA',modelo:'SIENNA',tipo:'FAMILIAR',precios:{'0Km':11620000,2025:10690000,2024:9835000,2023:9049000,2022:8324000,2021:7659000,2020:7046000,2019:6482000,2018:5963000,2017:5487000,2016:5047000}},
+{marca:'TOYOTA',modelo:'SUPRA GR',tipo:'COUPE',precios:{'0Km':208920000}},
+{marca:'TOYOTA',modelo:'SW4 4X4 DIAMOND II 2.8 TDI 6 AT 7A',tipo:'TODO TERRENO',precios:{'0Km':84924000,2025:76915150,2024:68906300,2023:65461000,2022:62187900,2021:58450100}},
+{marca:'TOYOTA',modelo:'SW4 4X4 GR-S 2.8 TDI 6 AT 7A',tipo:'TODO TERRENO',precios:{'0Km':89264000,2025:78680350,2024:68096700,2023:65699600,2022:61314200,2021:57845400}},
+{marca:'TOYOTA',modelo:'SW4 4X4 SRX 2.8 TDI 6 A/T 7A',tipo:'TODO TERRENO',precios:{2025:58510100,2024:55052400,2023:51429900,2022:49744700,2021:48098600,2020:47118000,2019:45409000}},
+{marca:'TOYOTA',modelo:'SW4 4X4 SRX 2.8 TDI 6 AT 7A',tipo:'TODO TERRENO',precios:{'0Km':84119000,2025:75825850,2024:67532700,2023:64156100,2022:60948300,2021:57900900,2020:54366000}},
+{marca:'TOYOTA',modelo:'YARIS',tipo:'RURAL 5 PUERTAS',precios:{2024:19624800,2023:18643600,2022:17711400}},
+{marca:'TOYOTA',modelo:'YARIS',tipo:'SEDAN 4 PUERTAS',precios:{2024:19624800,2023:18643600,2022:17711400}},
+{marca:'TOYOTA',modelo:'YARIS',tipo:'SEDAN 5 PUERTAS',precios:{2024:19624800,2023:18643600,2022:17711400}},
+{marca:'TOYOTA',modelo:'YARIS GLE SPORT',tipo:'SEDAN 5 PUERTAS',precios:{'0Km':32271000,2025:28059500,2024:23848000,2023:22712000,2022:21576000,2021:20498000,2020:19473000,2019:18499000,2018:17574000}},
+{marca:'TOYOTA',modelo:'YARIS S 1.5 6M/T',tipo:'SEDAN 5 PUERTAS',precios:{2024:22276800,2023:21163000,2022:20104900,2021:19099600}},
+{marca:'TOYOTA',modelo:'YARIS S 1.5 CVT',tipo:'SEDAN 5 PUERTAS',precios:{'0Km':32271000,2025:28059500,2024:23848000,2023:22712000,2022:21576000,2021:20498000,2020:19473000,2019:18499000,2018:17574000}},
+{marca:'TOYOTA',modelo:'YARIS XLI 1.5',tipo:'SEDAN 4 PUERTAS',precios:{'0Km':24951000,2025:24182500,2024:23414000,2023:22299000,2022:21184000,2021:20125000,2020:19118000,2019:18163000,2018:17254000}},
+{marca:'TOYOTA',modelo:'YARIS XLS 1.5 6M/T',tipo:'SEDAN 4 PUERTAS',precios:{'0Km':24951000,2025:24182500,2024:23414000,2023:22299000,2022:21184000,2021:20125000,2020:19118000,2019:18163000,2018:17254000}},
+{marca:'TOYOTA',modelo:'YARIS XLS 1.5 6M/T',tipo:'SEDAN 5 PUERTAS',precios:{'0Km':23371000,2025:23078000,2024:22785000,2023:21700000,2022:20615000,2021:19584000,2020:18605000,2019:17675000,2018:16791000}},
+{marca:'TOYOTA',modelo:'YARIS XLS 1.5 CVT',tipo:'SEDAN 4 PUERTAS',precios:{'0Km':25667000,2025:24878500,2024:24090000,2023:22943000,2022:21796000,2021:20706000,2020:19671000}},
+{marca:'TOYOTA',modelo:'YARIS XLS 1.5 CVT',tipo:'SEDAN 5 PUERTAS',precios:{'0Km':25422000,2025:24640500,2024:23859000,2023:22723000,2022:21586000,2021:20507000,2020:19482000}},
+{marca:'TOYOTA',modelo:'YARIS XLS PACK 1.5 CVT',tipo:'SEDAN 4 PUERTAS',precios:{'0Km':25383000,2025:24856000,2024:24329000,2023:23171000,2022:22012000,2021:20912000,2020:19866000,2019:18873000,2018:17929000}},
+{marca:'TOYOTA',modelo:'YARIS XLS PACK 1.5 CVT',tipo:'SEDAN 5 PUERTAS',precios:{'0Km':30895000,2025:27094000,2024:23293000,2023:22184000,2022:21074000,2021:20021000,2020:19020000,2019:18069000,2018:17165000}},
+{marca:'TOYOTA',modelo:'YARIS XLS+ 1.5 CVT 5P',tipo:'SEDAN 5 PUERTAS',precios:{'0Km':33352000,2025:29248800,2024:25145600,2023:23948200,2022:22750800,2021:21613300,2020:20532600,2019:19505900,2018:18530600}},
+{marca:'TOYOTA',modelo:'YARIS XS 1.5 6M/T',tipo:'SEDAN 4 PUERTAS',precios:{2024:20685600,2023:19651300,2022:18668700,2021:17735300}},
+{marca:'TOYOTA',modelo:'YARIS XS 1.5 6M/T',tipo:'SEDAN 5 PUERTAS',precios:{'0Km':20962000,2025:20666500,2024:20371000,2023:19400000,2022:18430000,2021:17509000,2020:16634000,2019:15802000,2018:15012000}},
+{marca:'TOYOTA',modelo:'YARIS XS 1.5 CVT',tipo:'SEDAN 5 PUERTAS',precios:{'0Km':30023000,2025:26072600,2024:22122200,2023:21068700}},
+{marca:'TOYOTA',modelo:'86 FT M/T',tipo:'COUPE',precios:{'0Km':51300000,2025:45900000,2024:40500000,2023:35100000,2022:31050000,2021:28350000,2020:27000000,2019:25650000}},
+{marca:'TOYOTA',modelo:'86 GT A/T',tipo:'COUPE',precios:{'0Km':60750000,2025:56700000,2024:51300000,2023:45900000,2022:40500000,2021:35100000,2020:31050000,2019:29700000,2018:28350000}},
+{marca:'TOYOTA',modelo:'86 GT M/T',tipo:'COUPE',precios:{'0Km':58050000,2025:54000000,2024:48600000,2023:43200000,2022:37800000,2021:32400000,2020:29700000,2019:28350000,2018:27000000}},
+// NISSAN
+{marca:'NISSAN',modelo:'350Z',tipo:'COUPE',precios:{2008:16439000,2007:15617000,2006:14836000,2005:14095000,2004:13390000,2003:12721000,2002:12084000}},
+{marca:'NISSAN',modelo:'350Z',tipo:'DESCAPOTABLE',precios:{2008:16439000,2007:15617000,2006:14836000,2005:14095000,2004:13390000,2003:12721000,2002:12084000}},
+{marca:'NISSAN',modelo:'370Z A/T',tipo:'COUPE',precios:{2020:32051000,2019:30448000,2018:28925000,2017:27479000,2016:26105000}},
+{marca:'NISSAN',modelo:'370Z M/T',tipo:'COUPE',precios:{2021:36236000,2020:34424000,2019:32703000,2018:31068000,2017:29514000,2016:28039000,2015:26637000}},
+{marca:'NISSAN',modelo:'370Z ROADSTER A/T',tipo:'DESCAPOTABLE',precios:{2021:37922000,2020:36025000,2019:34224000}},
+{marca:'NISSAN',modelo:'370Z ROADSTER M/T',tipo:'DESCAPOTABLE',precios:{2021:36236000,2020:34424000,2019:32703000,2018:31068000,2017:29514000,2016:28039000,2015:26637000}},
+{marca:'NISSAN',modelo:'4X4 CABINA DOBLE DIESEL',tipo:'PICK-UP',precios:{2002:4086000}},
+{marca:'NISSAN',modelo:'4X4 DOBLE CABINA NAFTA',tipo:'PICK-UP',precios:{2003:4048000,2002:3855000}},
+{marca:'NISSAN',modelo:'ALTIMA 2.5 S',tipo:'SEDAN 4 PUERTAS',precios:{2014:5235300,2013:4986900,2012:4749300,2011:4522500,2010:4307900,2009:4102700,2008:3906900,2007:3720600}},
+{marca:'NISSAN',modelo:'ALTIMA ADVANCE MEDIA-TECH PURE DRIVE',tipo:'SEDAN 4 PUERTAS',precios:{2016:15931000,2015:15134000}},
+{marca:'NISSAN',modelo:'ALTIMA ADVANCE PURE DRIVE',tipo:'SEDAN 4 PUERTAS',precios:{2016:14483000,2015:13759000}},
+{marca:'NISSAN',modelo:'CABINA DOBLE 2.5 DIESEL',tipo:'PICK-UP',precios:{2004:3946000,2003:3749000}},
+{marca:'NISSAN',modelo:'CABINA DOBLE 4X4 2.5 TDI',tipo:'PICK-UP',precios:{2005:4392000,2004:4173000}},
+{marca:'NISSAN',modelo:'CABINA DOBLE 4X4 DIESEL 2.7',tipo:'PICK-UP',precios:{2004:4194000}},
+{marca:'NISSAN',modelo:'CABINA DOBLE 4X4 DIESEL 3.2',tipo:'PICK-UP',precios:{2006:5053000,2005:4812000}},
+{marca:'NISSAN',modelo:'CABINA SIMPLE 2.0',tipo:'PICK-UP',precios:{2019:8862000,2018:8419000}},
+{marca:'NISSAN',modelo:'CABINA SIMPLE 2.5 DIESEL',tipo:'PICK-UP',precios:{2019:8862000,2018:8419000}},
+{marca:'NISSAN',modelo:'CABINA SIMPLE 3.2 4X4',tipo:'PICK-UP',precios:{2019:9163000,2018:8726000}},
+{marca:'NISSAN',modelo:'CABINA SIMPLE DIESEL 2.7',tipo:'PICK-UP',precios:{2004:8403000}},
+{marca:'NISSAN',modelo:'CABINA Y MEDIA DIESEL',tipo:'PICK-UP',precios:{2006:8403000}},
+{marca:'NISSAN',modelo:'DOBLE CABINA 4X4 DIESEL 3.2',tipo:'PICK-UP',precios:{2007:4830000,2006:4600000}},
+{marca:'NISSAN',modelo:'DOBLE CABINA 4X4 NAFTA 2.5',tipo:'PICK-UP',precios:{2003:4048000,2002:3855000}},
+{marca:'NISSAN',modelo:'DOBLE CABINA AX 4X4 DIESEL 3.2',tipo:'PICK-UP',precios:{2007:4830000,2006:4600000}},
+{marca:'NISSAN',modelo:'DOBLE CABINA DIESEL 2.7',tipo:'PICK-UP',precios:{2005:4392000,2004:4173000}},
+{marca:'NISSAN',modelo:'DOBLE CABINA TRUCK XE 4X4',tipo:'PICK-UP',precios:{2004:4194000}},
+{marca:'NISSAN',modelo:'FRONTIER 4X2 SE 2.8TD',tipo:'PICK-UP',precios:{2018:12746000,2017:12109000,2016:11504000,2015:10928000,2014:10382000,2013:9863000,2012:9370000,2011:8901000}},
+{marca:'NISSAN',modelo:'FRONTIER 4X2 XE CABINA SIMPLE',tipo:'PICK-UP',precios:{2018:9818000,2017:9327000,2016:8861000,2015:8418000,2014:7997000,2013:7597000,2012:7217000}},
+{marca:'NISSAN',modelo:'FRONTIER 4X2 XE 2.8TD',tipo:'PICK-UP',precios:{2018:12431000,2017:11810000,2016:11219000,2015:10658000,2014:10125000,2013:9619000,2012:9138000,2011:8681000}},
+{marca:'NISSAN',modelo:'FRONTIER 4X4 XE 2.8TD',tipo:'PICK-UP',precios:{2018:13145000,2017:12488000,2016:11863000,2015:11270000,2014:10707000,2013:10171000,2012:9663000,2011:9180000}},
+{marca:'NISSAN',modelo:'FRONTIER 4X4 SE 2.8TD',tipo:'PICK-UP',precios:{2018:13896000,2017:13201000,2016:12541000,2015:11914000,2014:11318000,2013:10752000,2012:10215000,2011:9704000}},
+{marca:'NISSAN',modelo:'FRONTIER KING CAB',tipo:'PICK-UP',precios:{2018:13145000,2017:12488000,2016:11863000,2015:11270000,2014:10707000,2013:10171000,2012:9663000,2011:9180000}},
+{marca:'NISSAN',modelo:'FRONTIER LE 4WD 5AT LUXE',tipo:'PICK-UP CABINA DOBLE',precios:{2022:22107700,2021:21002300,2020:19952200,2019:18954500}},
+{marca:'NISSAN',modelo:'FRONTIER LE 4WD 6MT',tipo:'PICK-UP CABINA DOBLE',precios:{2022:19419000,2021:18448000,2020:17525000,2019:16649000}},
+{marca:'NISSAN',modelo:'FRONTIER LE 4WD 6MT LUXE',tipo:'PICK-UP CABINA DOBLE',precios:{2022:22008000,2021:20907000,2020:19862000,2019:18869000}},
+{marca:'NISSAN',modelo:'FRONTIER NP300',tipo:'PICK-UP CABINA DOBLE',precios:{2019:11673000,2018:11111000,2017:10506000,2016:10004000,2015:8733000}},
+{marca:'NISSAN',modelo:'FRONTIER CD LE 2.3D 4X2 MT',tipo:'PICK-UP',precios:{'0Km':41012400,2025:38961800,2024:37013700,2023:35163000,2022:33404900}},
+{marca:'NISSAN',modelo:'FRONTIER CD LE 2.3D 4X4 AT',tipo:'PICK-UP',precios:{'0Km':41026500,2025:38975100,2024:37026400,2023:35175100,2022:33416300}},
+{marca:'NISSAN',modelo:'FRONTIER CD LE 2.3D 4X4 MT',tipo:'PICK-UP',precios:{'0Km':39965700,2025:37914300,2024:35965600,2023:34114300,2022:32355500}},
+{marca:'NISSAN',modelo:'FRONTIER CD S 2.3D 4X2 MT',tipo:'PICK-UP',precios:{'0Km':30981000,2025:29431900,2024:27960300,2023:26562300}},
+{marca:'NISSAN',modelo:'FRONTIER CD S 2.3D 4X4 MT',tipo:'PICK-UP',precios:{'0Km':32035400,2025:30380700,2024:28808600,2023:27315100}},
+{marca:'NISSAN',modelo:'FRONTIER CD SE 2.3D 4X2 MT',tipo:'PICK-UP',precios:{'0Km':32576800,2025:30947900,2024:29400600,2023:27930600}},
+{marca:'NISSAN',modelo:'FRONTIER CD SE 2.3D 4X4 MT',tipo:'PICK-UP',precios:{'0Km':33096200,2025:31441500,2024:29869400,2023:28375900}},
+{marca:'NISSAN',modelo:'FRONTIER CD XE 2.3D 4X2 MT',tipo:'PICK-UP',precios:{'0Km':38644500,2025:36712300,2024:34876700,2023:33132800,2022:31476200}},
+{marca:'NISSAN',modelo:'FRONTIER CD XE 2.3D 4X4 MT',tipo:'PICK-UP',precios:{'0Km':38815200,2025:36874400,2024:35030700,2023:33279200,2022:31615300}},
+{marca:'NISSAN',modelo:'FRONTIER CD X-GEAR 2.3D 4X2 AT',tipo:'PICK-UP',precios:{'0Km':37449400,2025:35576800,2024:33798000}},
+{marca:'NISSAN',modelo:'FRONTIER CD X-GEAR 2.3D 4X4 AT',tipo:'PICK-UP',precios:{'0Km':41026500,2025:38975100,2024:37026400}},
+{marca:'NISSAN',modelo:'FRONTIER CD X-GEAR PLUS 2.3D 4X4 AT',tipo:'PICK-UP',precios:{'0Km':41026500,2025:38975100}},
+{marca:'NISSAN',modelo:'FRONTIER PLATINUM 4X2 AT 2.3D',tipo:'PICK-UP',precios:{'0Km':63308300,2025:57241000,2024:51173700,2023:47591500,2022:44260200}},
+{marca:'NISSAN',modelo:'FRONTIER PLATINUM 4X4 AT 2.3D',tipo:'PICK-UP',precios:{'0Km':68610500,2025:64783900,2024:60957300,2023:56690300,2022:52722000}},
+{marca:'NISSAN',modelo:'FRONTIER PRO4X 4X4 AT 2.3D',tipo:'PICK-UP',precios:{'0Km':70594500,2025:66657200,2024:62719900,2023:58329500,2022:54246500}},
+{marca:'NISSAN',modelo:'FRONTIER S 4X2 AT 2.3D',tipo:'PICK-UP',precios:{'0Km':48538300,2025:43944600,2024:39350900,2023:36596400,2022:34034600}},
+{marca:'NISSAN',modelo:'FRONTIER S 4X2 MT 2.3D',tipo:'PICK-UP',precios:{'0Km':45712300,2025:41022750,2024:36333200,2023:33789900,2022:31424600}},
+{marca:'NISSAN',modelo:'FRONTIER S 4X4 MT 2.3D',tipo:'PICK-UP',precios:{'0Km':51035700,2025:45701150,2024:40366600,2023:37541000,2022:34913100}},
+{marca:'NISSAN',modelo:'FRONTIER SE PLUS 4X2 DIESEL',tipo:'PICK-UP CABINA DOBLE',precios:{2023:24092000,2022:22945000,2021:21797000}},
+{marca:'NISSAN',modelo:'FRONTIER XE 4X2 AT 2.3D',tipo:'PICK-UP',precios:{'0Km':63308300,2025:57241000,2024:51173700,2023:47591500,2022:44260200}},
+{marca:'NISSAN',modelo:'FRONTIER XE 4X2 MT 2.3D',tipo:'PICK-UP',precios:{'0Km':58893200,2025:53013350,2024:47133500,2023:43834200,2022:40765800}},
+{marca:'NISSAN',modelo:'FRONTIER XE 4X4 MT 2.3D',tipo:'PICK-UP',precios:{'0Km':58584900,2025:52735750,2024:46886600,2023:43604500,2022:40552200}},
+{marca:'NISSAN',modelo:'FRONTIER X-GEAR 4X4 AT 2.3D',tipo:'PICK-UP',precios:{'0Km':58643600,2025:54341200,2024:50038800,2023:46536000,2022:43278600}},
+{marca:'NISSAN',modelo:'NP300 FRONTIER LE 4X2 DIESEL',tipo:'PICK-UP CABINA DOBLE',precios:{2022:30064400,2021:28561200,2020:27133100,2019:25776400}},
+{marca:'NISSAN',modelo:'NP300 FRONTIER LE 4X4 AT DIESEL',tipo:'PICK-UP CABINA DOBLE',precios:{2022:30074700,2021:28571000,2020:27142400,2019:25785300}},
+{marca:'NISSAN',modelo:'NP300 FRONTIER LE 4X4 DIESEL',tipo:'PICK-UP CABINA DOBLE',precios:{2022:30074700,2021:28571000,2020:27142400,2019:25785300}},
+{marca:'NISSAN',modelo:'NP300 FRONTIER SE 4X2 DIESEL',tipo:'PICK-UP CABINA DOBLE',precios:{2017:22582000,2016:21453000}},
+{marca:'NISSAN',modelo:'NP300 FRONTIER XE 4X4 DIESEL',tipo:'PICK-UP CABINA DOBLE',precios:{2018:28453700,2017:27031100}},
+{marca:'NISSAN',modelo:'FRONTIER LE 4X4 OFF ROAD 6MT',tipo:'PICK-UP CABINA DOBLE',precios:{2023:24487600,2022:23263200,2021:22100100}},
+{marca:'NISSAN',modelo:'FRONTIER LE 4X4 OFFROAD 6MT LUXE',tipo:'PICK-UP CABINA DOBLE',precios:{2023:24496100,2022:23271200,2021:22107700}},
+{marca:'NISSAN',modelo:'GT-R',tipo:'COUPE',precios:{2021:36236000,2020:34424000,2019:32703000,2018:31068000,2017:29514000,2016:28039000,2015:26637000}},
+{marca:'NISSAN',modelo:'INTERSTAR DCI 120',tipo:'FURGON',precios:{2017:24648500,2016:23416100,2015:22245300,2014:21133000,2013:20076400,2012:19072600,2011:18118900,2010:17212900,2009:16352300,2008:15534700,2007:14758000,2006:14020000}},
+{marca:'NISSAN',modelo:'INTERSTAR DCI 90',tipo:'FAMILIAR',precios:{2017:24648500,2016:23416100,2015:22245300,2014:21133000,2013:20076400,2012:19072600,2011:18118900,2010:17212900,2009:16352300,2008:15534700,2007:14758000,2006:14020000}},
+{marca:'NISSAN',modelo:'JUKE',tipo:'SEDAN 5 PUERTAS',precios:{2016:5212000,2015:4951000,2014:4703000,2013:4468000}},
+{marca:'NISSAN',modelo:'KICKS 1.6 ADVANCE CVT',tipo:'SEDAN 5 PUERTAS',precios:{'0Km':35610000,2025:32410500,2024:29211000,2023:27751000,2022:26363000,2021:25045000}},
+{marca:'NISSAN',modelo:'KICKS 1.6 ADVANCE CVT PLUS',tipo:'SEDAN 5 PUERTAS',precios:{'0Km':40271300,2025:36818000,2024:33364700,2023:31696500,2022:30111600,2021:28606000}},
+{marca:'NISSAN',modelo:'KICKS 1.6 ADVANCE MT',tipo:'SEDAN 5 PUERTAS',precios:{2023:29490200,2022:28015700,2021:26615000}},
+{marca:'NISSAN',modelo:'KICKS 1.6 EXCLUSIVE CVT',tipo:'SEDAN 5 PUERTAS',precios:{'0Km':42291300,2025:38648850,2024:35006400,2023:32354400,2022:30232800,2021:28641600}},
+{marca:'NISSAN',modelo:'KICKS 1.6 EXCLUSIVE CVT BT',tipo:'SEDAN 5 PUERTAS',precios:{2024:30975400,2023:29426600}},
+{marca:'NISSAN',modelo:'KICKS 1.6 SENSE MT',tipo:'SEDAN 5 PUERTAS',precios:{'0Km':31927000,2025:28864500,2024:25802000,2023:24512000,2022:23286000,2021:22122000}},
+{marca:'NISSAN',modelo:'KICKS ADVANCE CVT',tipo:'SEDAN 5 PUERTAS',precios:{2021:19638000,2020:18657000,2019:17724000,2018:16838000,2017:15996000}},
+{marca:'NISSAN',modelo:'KICKS ADVANCE CVT UCL',tipo:'SEDAN 5 PUERTAS',precios:{2022:21250000,2021:20187000,2020:19178000,2019:18219000}},
+{marca:'NISSAN',modelo:'KICKS ADVANCE MT',tipo:'SEDAN 5 PUERTAS',precios:{2021:18890000,2020:17945000,2019:17048000,2018:16196000,2017:15386000}},
+{marca:'NISSAN',modelo:'KICKS EXCLUSIVE CVT',tipo:'SEDAN 5 PUERTAS',precios:{2021:22994000,2020:21845000,2019:20752000,2018:19715000,2017:18729000}},
+{marca:'NISSAN',modelo:'KICKS EXCLUSIVE CVT BT',tipo:'SEDAN 5 PUERTAS',precios:{2022:24879000,2021:23635000,2020:22453000,2019:21330000}},
+{marca:'NISSAN',modelo:'KICKS PLAY 1.6 ADVANCE CVT',tipo:'SEDAN 5 PUERTAS',precios:{'0Km':38454900,2025:34999950,2024:31545000,2023:29967700,2022:28469400,2021:27045900}},
+{marca:'NISSAN',modelo:'KICKS PLAY 1.6 ADVANCE CVT PLUS',tipo:'SEDAN 5 PUERTAS',precios:{'0Km':40271300,2025:36818000,2024:33364700,2023:31696500,2022:30111600,2021:28606000}},
+{marca:'NISSAN',modelo:'KICKS PLAY 1.6 EXCLUSIVE CVT',tipo:'SEDAN 5 PUERTAS',precios:{'0Km':42291300,2025:38648850,2024:35006400,2023:32354400,2022:30232800,2021:28641600}},
+{marca:'NISSAN',modelo:'KICKS PLAY 1.6 SENSE MT',tipo:'SEDAN 5 PUERTAS',precios:{'0Km':32347300,2025:29244400,2024:26141500,2023:24834500,2022:23592800,2021:22413100}},
+{marca:'NISSAN',modelo:'KICKS SENSE MT',tipo:'SEDAN 5 PUERTAS',precios:{2021:17634000,2020:16752000,2019:15915000,2018:15119000}},
+{marca:'NISSAN',modelo:'KICKS SPECIAL EDITION CVT',tipo:'SEDAN 5 PUERTAS',precios:{2022:21897000,2021:20802000,2020:19762000}},
+{marca:'NISSAN',modelo:'KICKS X-PLAY',tipo:'SEDAN 5 PUERTAS',precios:{'0Km':40741411,2025:36735305,2024:32729200,2023:31092800,2022:29538200,2021:28061200}},
+{marca:'NISSAN',modelo:'LEAF TEKNA',tipo:'SEDAN 5 PUERTAS',precios:{'0Km':64708800,2025:59404800,2024:54100800,2023:45614400,2022:37340200}},
+{marca:'NISSAN',modelo:'MARCH',tipo:'SEDAN 5 PUERTAS',precios:{2013:5083000,2012:4548000,2011:4089000}},
+{marca:'NISSAN',modelo:'MARCH ACENTA',tipo:'SEDAN 5 PUERTAS',precios:{2015:5421000,2014:4851000}},
+{marca:'NISSAN',modelo:'MARCH ACTIVE MT',tipo:'SEDAN 5 PUERTAS',precios:{2021:10083000,2020:9190000,2019:8266000,2018:7643000,2017:7033000,2016:6502000,2015:6012000,2014:5586000}},
+{marca:'NISSAN',modelo:'MARCH ADVANCE AT',tipo:'SEDAN 5 PUERTAS',precios:{2021:13106000,2020:11945000,2019:10744000}},
+{marca:'NISSAN',modelo:'MARCH ADVANCE MEDIA-TECH AT PURE DRIVE',tipo:'SEDAN 5 PUERTAS',precios:{2020:13489000,2019:12134000,2018:10857000,2017:9668000,2016:8650000}},
+{marca:'NISSAN',modelo:'MARCH ADVANCE MEDIA-TECH PURE DRIVE',tipo:'SEDAN 5 PUERTAS',precios:{2016:8952000,2015:8009000,2014:7167000,2013:6444000}},
+{marca:'NISSAN',modelo:'MARCH ADVANCE MT',tipo:'SEDAN 5 PUERTAS',precios:{2021:12518000,2020:11409000,2019:10262000,2018:9488000,2017:8731000,2016:8072000,2015:7464000,2014:6934000}},
+{marca:'NISSAN',modelo:'MARCH SENSE AT',tipo:'SEDAN 5 PUERTAS',precios:{2021:11924000,2020:10867000,2019:9775000}},
+{marca:'NISSAN',modelo:'MARCH SENSE MT',tipo:'SEDAN 5 PUERTAS',precios:{2021:10240000,2020:9211000,2019:8517000,2018:7837000,2017:7245000,2016:6699000,2015:6224000}},
+{marca:'NISSAN',modelo:'MARCH SPORT PURE DRIVE',tipo:'SEDAN 5 PUERTAS',precios:{2013:5760000,2012:5154000,2011:4634000}},
+{marca:'NISSAN',modelo:'MARCH SR',tipo:'SEDAN 5 PUERTAS',precios:{2013:5760000,2012:5154000,2011:4634000}},
+{marca:'NISSAN',modelo:'MARCH VISIA',tipo:'SEDAN 5 PUERTAS',precios:{2013:5083000,2012:4548000,2011:4089000}},
+{marca:'NISSAN',modelo:'MARCH VISIA PLUS',tipo:'SEDAN 5 PUERTAS',precios:{2013:5252000,2012:4699000,2011:4225000}},
+{marca:'NISSAN',modelo:'MICRA',tipo:'SEDAN 5 PUERTAS',precios:{2010:5569000,2009:5179000,2008:4817000,2007:4480000,2006:4166000,2005:3875000,2004:3603000,2003:3351000}},
+{marca:'NISSAN',modelo:'MURANO',tipo:'TODO TERRENO',precios:{2014:9440000,2013:9035000,2012:8496000,2011:8091000,2010:7686000}},
+{marca:'NISSAN',modelo:'MURANO AWD 4X4',tipo:'TODO TERRENO',precios:{2022:21600000,2021:20251400,2020:17551400,2019:16201400,2018:14851400}},
+{marca:'NISSAN',modelo:'MURANO EXCLUSIVE CVT',tipo:'RURAL 5 PUERTAS',precios:{'0Km':47198000,2025:40455000,2024:35061000,2023:32364000}},
+{marca:'NISSAN',modelo:'MURANO EXCLUSIVE CVT',tipo:'TODO TERRENO',precios:{'0Km':47198000,2025:40455000,2024:35061000,2023:32364000}},
+{marca:'NISSAN',modelo:'MURANO S AWD',tipo:'TODO TERRENO',precios:{2014:9440000,2013:9035000,2012:8496000,2011:8091000,2010:7686000}},
+{marca:'NISSAN',modelo:'MURANO SE AWD',tipo:'TODO TERRENO',precios:{2014:9440000,2013:9035000,2012:8496000,2011:8091000,2010:7686000}},
+{marca:'NISSAN',modelo:'MURANO SL',tipo:'RURAL 5 PUERTAS',precios:{2011:8765000,2010:8361000,2009:7956000,2008:7552000,2007:7147000}},
+{marca:'NISSAN',modelo:'MURANO SL AWD',tipo:'TODO TERRENO',precios:{2014:9440000,2013:9035000,2012:8496000,2011:8091000,2010:7686000}},
+{marca:'NISSAN',modelo:'MURANO SV',tipo:'TODO TERRENO',precios:{'0Km':47198000,2025:40455000,2024:35061000,2023:32364000}},
+{marca:'NISSAN',modelo:'MURANO XTRONIC CVT',tipo:'TODO TERRENO',precios:{2019:17531000,2018:16182000,2017:14834000,2016:13485000,2015:12137000,2014:10788000}},
+{marca:'NISSAN',modelo:'NAVARA 2.5 TDI',tipo:'TODO TERRENO',precios:{2010:11394000,2009:10851840}},
+{marca:'NISSAN',modelo:'NAVARA 2.5 TDI 4X4',tipo:'PICK-UP',precios:{2010:11394000,2009:10851840}},
+{marca:'NISSAN',modelo:'NOTE ADVANCE CVT',tipo:'SEDAN 5 PUERTAS',precios:{2021:13616000,2020:12935000,2019:12288000}},
+{marca:'NISSAN',modelo:'NOTE ADVANCE PURE DRIVE',tipo:'SEDAN 5 PUERTAS',precios:{2018:10721000,2017:10185000,2016:9676000,2015:9192000,2014:8732000}},
+{marca:'NISSAN',modelo:'NOTE EXCLUSIVE CVT PURE DRIVE',tipo:'SEDAN 5 PUERTAS',precios:{2020:14231000,2019:13520000,2018:12844000,2017:12201000,2016:11591000,2015:11012000}},
+{marca:'NISSAN',modelo:'NOTE SENSE CVT',tipo:'SEDAN 5 PUERTAS',precios:{2021:15518000,2020:14742000,2019:14005000}},
+{marca:'NISSAN',modelo:'NOTE SENSE PURE DRIVE',tipo:'SEDAN 5 PUERTAS',precios:{2019:11539000,2018:10962000,2017:10414000,2016:9893000,2015:9399000,2014:8929000}},
+{marca:'NISSAN',modelo:'NOTE SR CVT',tipo:'SEDAN 5 PUERTAS',precios:{2021:15518000,2020:14742000,2019:14005000}},
+{marca:'NISSAN',modelo:'PATHFINDER',tipo:'TODO TERRENO',precios:{2014:6291000,2013:5976000,2012:5678000,2011:5394000,2010:5124000,2009:4868000,2008:4624000,2007:4393000,2006:4173000}},
+{marca:'NISSAN',modelo:'PATHFINDER',tipo:'RURAL 5 PUERTAS',precios:{2014:6291000,2013:5976000,2012:5678000,2011:5394000,2010:5124000,2009:4868000,2008:4624000,2007:4393000,2006:4173000}},
+{marca:'NISSAN',modelo:'PATHFINDER 3.3 AUTOMATICA',tipo:'TODO TERRENO',precios:{2014:6291000,2013:5976000,2012:5678000,2011:5394000,2010:5124000,2009:4868000,2008:4624000,2007:4393000,2006:4173000}},
+{marca:'NISSAN',modelo:'PATHFINDER 4X4 DIESEL',tipo:'TODO TERRENO',precios:{2014:6291000,2013:5976000,2012:5678000,2011:5394000,2010:5124000,2009:4868000,2008:4624000,2007:4393000,2006:4173000}},
+{marca:'NISSAN',modelo:'PATHFINDER LE 2.5DCI',tipo:'TODO TERRENO',precios:{2014:6291000,2013:5976000,2012:5678000,2011:5394000,2010:5124000,2009:4868000,2008:4624000,2007:4393000,2006:4173000}},
+{marca:'NISSAN',modelo:'PATHFINDER LE 4X4',tipo:'TODO TERRENO',precios:{2014:6291000,2013:5976000,2012:5678000,2011:5394000,2010:5124000,2009:4868000,2008:4624000,2007:4393000,2006:4173000}},
+{marca:'NISSAN',modelo:'PATHFINDER SE 3.0',tipo:'TODO TERRENO',precios:{2014:6291000,2013:5976000,2012:5678000,2011:5394000,2010:5124000,2009:4868000,2008:4624000,2007:4393000,2006:4173000}},
+{marca:'NISSAN',modelo:'PATHFINDER SE 3.3',tipo:'TODO TERRENO',precios:{2014:6291000,2013:5976000,2012:5678000,2011:5394000,2010:5124000,2009:4868000,2008:4624000,2007:4393000,2006:4173000}},
+{marca:'NISSAN',modelo:'PATHFINDER SE 3.5',tipo:'TODO TERRENO',precios:{2014:6291000,2013:5976000,2012:5678000,2011:5394000,2010:5124000,2009:4868000,2008:4624000,2007:4393000,2006:4173000}},
+{marca:'NISSAN',modelo:'PATHFINDER SE 4.0L',tipo:'TODO TERRENO',precios:{2014:6291000,2013:5976000,2012:5678000,2011:5394000,2010:5124000,2009:4868000,2008:4624000,2007:4393000,2006:4173000}},
+{marca:'NISSAN',modelo:'PATHFINDER SE V6',tipo:'TODO TERRENO',precios:{2014:6291000,2013:5976000,2012:5678000,2011:5394000,2010:5124000,2009:4868000,2008:4624000,2007:4393000,2006:4173000}},
+{marca:'NISSAN',modelo:'PATHFINDER XE V6',tipo:'TODO TERRENO',precios:{2014:6291000,2013:5976000,2012:5678000,2011:5394000,2010:5124000,2009:4868000,2008:4624000,2007:4393000,2006:4173000}},
+{marca:'NISSAN',modelo:'PATROL',tipo:'PICK-UP',precios:{2002:10061000}},
+{marca:'NISSAN',modelo:'PATROL 4X4',tipo:'TODO TERRENO',precios:{2002:10241000}},
+{marca:'NISSAN',modelo:'PATROL 4X4 GR',tipo:'TODO TERRENO',precios:{2002:10061000}},
+{marca:'NISSAN',modelo:'PATROL GR 4X4 TD',tipo:'TODO TERRENO',precios:{2002:9403000}},
+{marca:'NISSAN',modelo:'PRIMASTAR',tipo:'FAMILIAR',precios:{2017:24648500,2016:23416100,2015:22245300,2014:21133000,2013:20076400,2012:19072600,2011:18118900,2010:17212900,2009:16352300,2008:15534700,2007:14758000,2006:14020000}},
+{marca:'NISSAN',modelo:'PRIMASTAR DCI 100',tipo:'FAMILIAR',precios:{2017:24648500,2016:23416100,2015:22245300,2014:21133000,2013:20076400,2012:19072600,2011:18118900,2010:17212900,2009:16352300,2008:15534700,2007:14758000,2006:14020000}},
+{marca:'NISSAN',modelo:'PRIMASTAR DCI 115',tipo:'FAMILIAR',precios:{2024:53212000,2023:50551000,2022:48024000,2021:45623000,2020:43341000,2019:41174000,2018:39116000,2017:37159000,2016:29800000,2015:27714000,2014:25775000,2013:23969000,2012:22292000,2011:17215000,2010:16355000,2009:15537000,2008:14760000,2007:13773000,2006:13084000,2005:12430000}},
+{marca:'NISSAN',modelo:'PRIMASTAR DCI 150',tipo:'FAMILIAR',precios:{2017:27343000,2016:25976000,2015:24677000,2014:23443000,2013:22271000,2012:21158000,2011:20100000,2010:19095000,2009:18140000,2008:17233000,2007:16371000,2006:15553000}},
+{marca:'NISSAN',modelo:'PRIMERA',tipo:'SEDAN 5 PUERTAS',precios:{2002:1450000}},
+{marca:'NISSAN',modelo:'PRIMERA GX',tipo:'SEDAN 4 PUERTAS',precios:{2002:1450000}},
+{marca:'NISSAN',modelo:'PRIMERA GXE',tipo:'SEDAN 4 PUERTAS',precios:{2002:1450000}},
+{marca:'NISSAN',modelo:'PRIMERA SLX 2.0 TD',tipo:'SEDAN 5 PUERTAS',precios:{2002:1450000}},
+{marca:'NISSAN',modelo:'SENTRA 1.8 S',tipo:'SEDAN 4 PUERTAS',precios:{2015:5489400,2014:5215000,2013:4954200,2012:4706500}},
+{marca:'NISSAN',modelo:'SENTRA 2.0 ADVANCE CVT',tipo:'SEDAN 4 PUERTAS',precios:{'0Km':43472300,2025:38955200,2024:34438100,2023:32716200,2022:31080400,2021:29526400,2020:28050000}},
+{marca:'NISSAN',modelo:'SENTRA 2.0 ADVANCE MT',tipo:'SEDAN 4 PUERTAS',precios:{2023:31293600,2022:30020600,2021:28535500,2020:26944300}},
+{marca:'NISSAN',modelo:'SENTRA 2.0 EXCLUSIVE CVT',tipo:'SEDAN 4 PUERTAS',precios:{'0Km':48902200,2025:43545500,2024:38188800,2023:35006400,2022:31824000,2021:29702400,2020:27580800}},
+{marca:'NISSAN',modelo:'SENTRA 2.0 SR CVT',tipo:'SEDAN 4 PUERTAS',precios:{'0Km':48902200,2025:43545500,2024:38188800,2023:35006400,2022:31824000,2021:29702400,2020:27580800}},
+{marca:'NISSAN',modelo:'SENTRA ACENTA 6MT',tipo:'SEDAN 4 PUERTAS',precios:{2016:4738000,2015:4501000,2014:4276000,2013:4062000}},
+{marca:'NISSAN',modelo:'SENTRA ACENTA XTRONIC CVT',tipo:'SEDAN 4 PUERTAS',precios:{2016:4896000,2015:4651000,2014:4419000,2013:4198000}},
+{marca:'NISSAN',modelo:'SENTRA ADVANCE MT',tipo:'SEDAN 4 PUERTAS',precios:{2022:15999000,2021:15199000}},
+{marca:'NISSAN',modelo:'SENTRA ADVANCE PURE DRIVE',tipo:'SEDAN 4 PUERTAS',precios:{2019:10400000,2018:9879000,2017:9386000,2016:8916000,2015:8470000,2014:8047000}},
+{marca:'NISSAN',modelo:'SENTRA EXCLUSIVE CVT',tipo:'SEDAN 4 PUERTAS',precios:{2022:20452000,2021:19429000}},
+{marca:'NISSAN',modelo:'SENTRA EXCLUSIVE CVT PURE DRIVE',tipo:'SEDAN 4 PUERTAS',precios:{2019:13291000,2018:12627000,2017:11995000,2016:11396000,2015:10826000,2014:10284000}},
+{marca:'NISSAN',modelo:'SENTRA GLE',tipo:'SEDAN 4 PUERTAS',precios:{2002:1637000}},
+{marca:'NISSAN',modelo:'SENTRA GSX',tipo:'SEDAN 4 PUERTAS',precios:{2002:1637000}},
+{marca:'NISSAN',modelo:'SENTRA GXE',tipo:'SEDAN 4 PUERTAS',precios:{2002:1637000}},
+{marca:'NISSAN',modelo:'SENTRA SENSE',tipo:'SEDAN 4 PUERTAS',precios:{2019:8511000,2018:8086000,2017:7682000,2016:7298000}},
+{marca:'NISSAN',modelo:'SENTRA SENSE PURE DRIVE',tipo:'SEDAN 4 PUERTAS',precios:{2019:8511000,2018:8086000,2017:7682000,2016:7298000}},
+{marca:'NISSAN',modelo:'SENTRA SR CVT',tipo:'SEDAN 4 PUERTAS',precios:{2022:18305000,2021:17389000}},
+{marca:'NISSAN',modelo:'SENTRA SR CVT PURE DRIVE',tipo:'SEDAN 4 PUERTAS',precios:{2019:11896000,2018:11301000,2017:10736000,2016:10199000,2015:9689000,2014:9205000}},
+{marca:'NISSAN',modelo:'SENTRA SV PURE DRIVE',tipo:'SEDAN 4 PUERTAS',precios:{2016:5212000,2015:4951000,2014:4703000,2013:4468000}},
+{marca:'NISSAN',modelo:'SENTRA TEKNA XTRONIC CVT',tipo:'SEDAN 4 PUERTAS',precios:{2016:5212000,2015:4951000,2014:4703000,2013:4468000}},
+{marca:'NISSAN',modelo:'SENTRA XTRONIC CVT',tipo:'SEDAN 4 PUERTAS',precios:{2016:4896000,2015:4651000,2014:4419000,2013:4198000}},
+{marca:'NISSAN',modelo:'SUNNY EX SALOON',tipo:'SEDAN 4 PUERTAS',precios:{2002:1637000}},
+{marca:'NISSAN',modelo:'TEANA 250 XV V6',tipo:'SEDAN 4 PUERTAS',precios:{2011:5961000,2010:5690000,2009:5419000}},
+{marca:'NISSAN',modelo:'TEANA 350 XV V6',tipo:'SEDAN 4 PUERTAS',precios:{2011:6246000,2010:5975000,2009:5703000}},
+{marca:'NISSAN',modelo:'TERRANO II',tipo:'TODO TERRENO',precios:{2007:4916000,2006:4693000,2005:4469000,2004:4335000}},
+{marca:'NISSAN',modelo:'TERRANO II 2.7 TD',tipo:'TODO TERRENO',precios:{2007:4916000,2006:4693000,2005:4469000,2004:4335000}},
+{marca:'NISSAN',modelo:'TERRANO II SE',tipo:'TODO TERRENO',precios:{2003:4135000}},
+{marca:'NISSAN',modelo:'TERRANO II SE 2.4',tipo:'TODO TERRENO',precios:{2003:4135000}},
+{marca:'NISSAN',modelo:'TERRANO II SE 2.7 TDI',tipo:'TODO TERRENO',precios:{2003:4135000}},
+{marca:'NISSAN',modelo:'TERRANO II SLX',tipo:'TODO TERRENO',precios:{2007:4916000,2006:4693000,2005:4469000,2004:4335000}},
+{marca:'NISSAN',modelo:'TIIDA',tipo:'SEDAN 4 PUERTAS',precios:{2013:5834000,2012:5426000,2011:5046000,2010:4693000,2009:4364000,2008:4058000}},
+{marca:'NISSAN',modelo:'TIIDA',tipo:'SEDAN 5 PUERTAS',precios:{2013:6684000,2012:6216000,2011:5781000,2010:5376000,2009:5000000,2008:4649000,2007:4324000,2006:4021000,2005:3740000}},
+{marca:'NISSAN',modelo:'TIIDA 1.8 6MT ACENTA',tipo:'SEDAN 4 PUERTAS',precios:{2013:5140000,2012:4781000,2011:4446000}},
+{marca:'NISSAN',modelo:'TIIDA 1.8 6MT ACENTA',tipo:'SEDAN 5 PUERTAS',precios:{2013:6190000,2012:5757000,2011:5354000,2010:4979000,2009:4631000,2008:4307000}},
+{marca:'NISSAN',modelo:'TIIDA 1.8 6MT TEKNA',tipo:'SEDAN 4 PUERTAS',precios:{2013:5834000,2012:5426000,2011:5046000,2010:4693000,2009:4364000,2008:4058000}},
+{marca:'NISSAN',modelo:'TIIDA 1.8 6MT TEKNA',tipo:'SEDAN 5 PUERTAS',precios:{2013:6684000,2012:6216000,2011:5781000,2010:5376000,2009:5000000,2008:4649000,2007:4324000,2006:4021000,2005:3740000}},
+{marca:'NISSAN',modelo:'TIIDA 1.8 6MT VISIA',tipo:'SEDAN 4 PUERTAS',precios:{2011:4204000,2010:3910000,2009:3636000,2008:3382000,2007:3145000}},
+{marca:'NISSAN',modelo:'TIIDA 1.8 6MT VISIA',tipo:'SEDAN 5 PUERTAS',precios:{2010:5569000,2009:5179000,2008:4817000,2007:4480000,2006:4166000,2005:3875000,2004:3603000,2003:3351000}},
+{marca:'NISSAN',modelo:'TITAN V8 5.6',tipo:'PICK-UP CABINA Y MEDIA',precios:{2008:16439000,2007:15617000,2006:14836000,2005:14095000,2004:13390000,2003:12721000,2002:12084000}},
+{marca:'NISSAN',modelo:'VERSA',tipo:'SEDAN 4 PUERTAS',precios:{2018:9316000,2017:8849000,2016:8407000,2015:7987000,2014:7587000,2013:7208000,2012:6847000}},
+{marca:'NISSAN',modelo:'VERSA',tipo:'SEDAN 5 PUERTAS',precios:{2013:5834000,2012:5426000,2011:5046000,2010:4693000,2009:4364000,2008:4058000}},
+{marca:'NISSAN',modelo:'VERSA 1.6 ADVANCE CVT',tipo:'SEDAN 4 PUERTAS',precios:{'0Km':32131000,2025:28335000,2024:24539000,2023:23312000,2022:22146000,2021:21039000,2020:19987000}},
+{marca:'NISSAN',modelo:'VERSA 1.6 ADVANCE MT',tipo:'SEDAN 4 PUERTAS',precios:{'0Km':30564000,2025:26953000,2024:23342000,2023:22175000,2022:21066000,2021:20012000,2020:19012000}},
+{marca:'NISSAN',modelo:'VERSA 1.6 EXCLUSIVE CVT',tipo:'SEDAN 4 PUERTAS',precios:{'0Km':39201400,2025:34421850,2024:29642300,2023:28160200,2022:26752100,2021:25414600,2020:24143800}},
+{marca:'NISSAN',modelo:'VERSA 1.6 SENSE CVT',tipo:'SEDAN 4 PUERTAS',precios:{2023:24398400,2022:23178500,2021:22019600,2020:20918600}},
+{marca:'NISSAN',modelo:'VERSA 1.6 SENSE MT',tipo:'SEDAN 4 PUERTAS',precios:{'0Km':31601000,2025:27060500,2024:22520000,2023:21394000,2022:20324000,2021:19308000,2020:18342000}},
+{marca:'NISSAN',modelo:'VERSA 1.6 SR CVT',tipo:'SEDAN 4 PUERTAS',precios:{'0Km':38447400,2025:33905100,2024:29362800}},
+{marca:'NISSAN',modelo:'VERSA ACENTA',tipo:'SEDAN 4 PUERTAS',precios:{2014:4875000,2013:4632000}},
+{marca:'NISSAN',modelo:'VERSA ACENTA A/T',tipo:'SEDAN 4 PUERTAS',precios:{2014:5231000,2013:4969000}},
+{marca:'NISSAN',modelo:'VERSA ADVANCE AT',tipo:'SEDAN 4 PUERTAS',precios:{2018:9316000,2017:8849000,2016:8407000,2015:7987000,2014:7587000,2013:7208000,2012:6847000}},
+{marca:'NISSAN',modelo:'VERSA ADVANCE MT',tipo:'SEDAN 4 PUERTAS',precios:{2018:9178000,2017:8719000,2016:8283000,2015:7869000,2014:7476000,2013:7102000,2012:6746000}},
+{marca:'NISSAN',modelo:'VERSA EXCLUSIVE AT',tipo:'SEDAN 4 PUERTAS',precios:{2018:10418000,2017:9898000,2016:9403000,2015:8932000,2014:8486000,2013:8061000,2012:7658000}},
+{marca:'NISSAN',modelo:'VERSA S',tipo:'SEDAN 5 PUERTAS',precios:{2013:6684000,2012:6216000,2011:5781000,2010:5376000,2009:5000000,2008:4649000,2007:4324000,2006:4021000,2005:3740000}},
+{marca:'NISSAN',modelo:'VERSA SENSE AT',tipo:'SEDAN 4 PUERTAS',precios:{2021:9269000,2020:8805000,2019:8365000}},
+{marca:'NISSAN',modelo:'VERSA SENSE MT',tipo:'SEDAN 4 PUERTAS',precios:{2021:8137000,2020:7730000,2019:7344000,2018:6976000,2017:6628000,2016:6297000,2015:5982000}},
+{marca:'NISSAN',modelo:'VERSA V-DRIVE MT',tipo:'SEDAN 4 PUERTAS',precios:{2023:14164000,2022:13490000,2021:12847000}},
+{marca:'NISSAN',modelo:'VERSA V-DRIVE PLUS AT',tipo:'SEDAN 4 PUERTAS',precios:{2023:15738000,2022:14988000,2021:14274000}},
+{marca:'NISSAN',modelo:'VERSA VISIA',tipo:'SEDAN 4 PUERTAS',precios:{2013:4491000,2012:4266000}},
+{marca:'NISSAN',modelo:'X TERRA',tipo:'TODO TERRENO',precios:{2020:8199000,2019:7789000,2018:7400000,2017:7030000,2016:6678000,2015:6344000,2014:6027000,2013:5726000}},
+{marca:'NISSAN',modelo:'X TERRA XE',tipo:'TODO TERRENO',precios:{2022:22925000,2021:20632000,2020:18609000}},
+{marca:'NISSAN',modelo:'XTERRA',tipo:'TODO TERRENO',precios:{2020:8199000,2019:7789000,2018:7400000,2017:7030000,2016:6678000,2015:6344000,2014:6027000,2013:5726000}},
+{marca:'NISSAN',modelo:'X-TERRA SE',tipo:'TODO TERRENO',precios:{2020:8199000,2019:7789000,2018:7400000,2017:7030000,2016:6678000,2015:6344000,2014:6027000,2013:5726000}},
+{marca:'NISSAN',modelo:'X-TRAIL',tipo:'TODO TERRENO',precios:{2015:11475000,2014:10901300,2013:10355900,2012:9838800,2011:9346100,2010:8879000,2009:8434800}},
+{marca:'NISSAN',modelo:'X-TRAIL 2.2 DIESEL',tipo:'TODO TERRENO',precios:{2016:12048800,2015:11475000,2014:10901300,2013:10355900,2012:9838800}},
+{marca:'NISSAN',modelo:'X-TRAIL 2.5 6MT',tipo:'TODO TERRENO',precios:{2015:11475000,2014:10901300,2013:10355900,2012:9838800,2011:9346100,2010:8879000,2009:8434800}},
+{marca:'NISSAN',modelo:'X-TRAIL 2.5 6MT ACENTA',tipo:'TODO TERRENO',precios:{2018:14175000,2017:13466300,2016:12792600,2015:12152700}},
+{marca:'NISSAN',modelo:'X-TRAIL 2.5 6MT VISIA',tipo:'TODO TERRENO',precios:{2016:13500000,2015:12825000,2014:12183800,2013:11574900}},
+{marca:'NISSAN',modelo:'X-TRAIL 2.5 CVT',tipo:'TODO TERRENO',precios:{2018:14883800,2017:14139900,2016:13432500,2015:12761600}},
+{marca:'NISSAN',modelo:'X-TRAIL 2.5 CVT ACENTA',tipo:'TODO TERRENO',precios:{2018:14883800,2017:14139900,2016:13432500,2015:12761600}},
+{marca:'NISSAN',modelo:'X-TRAIL 2.5 CVT TEKNA',tipo:'TODO TERRENO',precios:{2018:15609000,2017:14828000,2016:14088000,2015:13383000}},
+{marca:'NISSAN',modelo:'X-TRAIL 2.5 CVT VISIA',tipo:'TODO TERRENO',precios:{2019:18225000,2016:14175000,2015:13466300,2014:12792600,2013:12152700}},
+{marca:'NISSAN',modelo:'X-TRAIL 2.5 EXCLUSIVE CVT',tipo:'TODO TERRENO',precios:{'0Km':68793400,2025:64099100,2024:59404800,2023:55161600}},
+{marca:'NISSAN',modelo:'X-TRAIL ACENTA 2.0 DCI 6MT',tipo:'TODO TERRENO',precios:{2022:19575000,2021:18596300,2020:17666100,2019:16783200}},
+{marca:'NISSAN',modelo:'X-TRAIL ACENTA 2.5 6MT',tipo:'TODO TERRENO',precios:{2022:18630000,2021:17698500,2020:16814300,2019:15973200}},
+{marca:'NISSAN',modelo:'X-TRAIL ADVANCE CVT',tipo:'TODO TERRENO',precios:{'0Km':48796800,2025:43492800}},
+{marca:'NISSAN',modelo:'X-TRAIL EPOWER EXCLUSIVE CVT',tipo:'TODO TERRENO',precios:{'0Km':84472500,2025:77242650,2024:70012800,2023:64708800}},
+{marca:'NISSAN',modelo:'X-TRAIL EXCLUSIVE CVT',tipo:'TODO TERRENO',precios:{2024:54100800,2023:49857600,2022:45614400,2021:42432000,2020:39249600,2019:36067200}},
+{marca:'NISSAN',modelo:'X-TRAIL TEKNA XTRONIC CVT',tipo:'TODO TERRENO',precios:{2022:19575000,2021:18596300,2020:17666100,2019:16783200}},
+// RENAULT
+{marca:'RENAULT',modelo:'ALASKAN CONFORT 4X2 MT',tipo:'PICK-UP',precios:{2025:41031400,2024:33722800,2023:31699500,2022:29797500,2021:28009700,2020:26329100}},
+{marca:'RENAULT',modelo:'ALASKAN CONFORT 4X4 MT',tipo:'PICK-UP',precios:{2025:45246750,2024:36743500,2023:34538800,2022:32466500,2021:30518500,2020:28687500}},
+{marca:'RENAULT',modelo:'ALASKAN EMOTION 4X2 MT',tipo:'PICK-UP',precios:{2025:44054350,2024:35778700,2023:33631900,2022:31614000,2021:29717200,2020:27934200}},
+{marca:'RENAULT',modelo:'ALASKAN EMOTION 4X4 MT',tipo:'PICK-UP',precios:{2025:48073600,2024:39827200,2023:37437600,2022:35191300,2021:33079800,2020:31095100}},
+{marca:'RENAULT',modelo:'ALASKAN ICONIC 4X4 AT',tipo:'PICK-UP',precios:{'0Km':70730000,2025:59543550,2024:48357100,2023:45455700,2022:42728300,2021:40164600,2020:37754700}},
+{marca:'RENAULT',modelo:'ALASKAN ICONIC 4X4 MT',tipo:'PICK-UP',precios:{2025:43650400,2024:41031300,2023:38569400,2022:36255200}},
+{marca:'RENAULT',modelo:'ALASKAN INTENS 4X2 MT',tipo:'PICK-UP',precios:{2025:47765100,2024:38790200,2023:36462800,2022:34275100,2021:32218600,2020:30285400}},
+{marca:'RENAULT',modelo:'ALASKAN INTENS 4X2 AT',tipo:'PICK-UP',precios:{2025:49527000,2024:40224000,2023:37810600}},
+{marca:'RENAULT',modelo:'ALASKAN INTENS 4X4 MT',tipo:'PICK-UP',precios:{2025:51806200,2024:42072400,2023:39548100,2022:37175100,2021:34944600,2020:32848000}},
+{marca:'RENAULT',modelo:'ALASKAN INTENS 4X4 AT',tipo:'PICK-UP',precios:{2025:54157000,2024:43984000,2023:41784700}},
+{marca:'RENAULT',modelo:'ALASKAN INTENS NOIR 4X4 MT',tipo:'PICK-UP',precios:{2025:51806200,2024:42072400,2023:39548100,2022:37175100,2021:34944600,2020:32848000}},
+{marca:'RENAULT',modelo:'ALASKAN INTENS NOIR 4X4 AT',tipo:'PICK-UP',precios:{2025:54157000,2024:43984000,2023:41784700}},
+{marca:'RENAULT',modelo:'ALASKAN OUTSIDER 4X4 MT',tipo:'PICK-UP',precios:{2024:45455700,2023:42728300}},
+{marca:'RENAULT',modelo:'ARKANA E-TECH HYBRID ESPRIT ALPINE',tipo:'SEDAN 5 PUERTAS',precios:{'0Km':51820000,2025:46638000}},
+{marca:'RENAULT',modelo:'CAPTUR INTENS 1.6 CVT',tipo:'RURAL 5 PUERTAS',precios:{2024:26520000,2023:25194000,2022:23934400,2021:22737600,2020:21600700}},
+{marca:'RENAULT',modelo:'CAPTUR INTENS 2.0',tipo:'RURAL 5 PUERTAS',precios:{2024:27050400,2023:25697900,2022:24413000,2021:23192300,2020:22032700,2019:20931000,2018:19884500}},
+{marca:'RENAULT',modelo:'CAPTUR LIFE 1.6',tipo:'RURAL 5 PUERTAS',precios:{2024:23337600,2023:22170700,2022:21062200,2021:20009100}},
+{marca:'RENAULT',modelo:'CAPTUR ZEN 1.6',tipo:'RURAL 5 PUERTAS',precios:{2024:24732000,2023:23496000,2022:22321000,2021:21205000,2020:20145000,2019:19137000,2018:18181000}},
+{marca:'RENAULT',modelo:'CAPTUR ZEN 2.0',tipo:'RURAL 5 PUERTAS',precios:{2024:24732000,2023:23496000,2022:22321000,2021:21205000,2020:20145000,2019:19137000,2018:18181000}},
+{marca:'RENAULT',modelo:'CAPTUR BOSE 1.6 CVT',tipo:'RURAL 5 PUERTAS',precios:{2024:27580800,2023:26201800,2022:24891700,2021:23647100}},
+{marca:'RENAULT',modelo:'DUSTER CONFORT 1.6 4X2',tipo:'RURAL 5 PUERTAS',precios:{2019:14311200,2018:13738800,2017:13189300,2016:12661700,2015:12155200}},
+{marca:'RENAULT',modelo:'DUSTER ICONIC 1.3T 4X2 CVT',tipo:'RURAL 5 PUERTAS',precios:{'0Km':41286000,2025:35176000,2024:29066000,2023:27613000,2022:26233000,2021:24921000}},
+{marca:'RENAULT',modelo:'DUSTER ICONIC 1.3T 4X4 MT',tipo:'TODO TERRENO',precios:{'0Km':43309000,2025:37130500,2024:30952000,2023:29405000,2022:27934000,2021:26538000}},
+{marca:'RENAULT',modelo:'DUSTER INTENS 1.6 CVT',tipo:'RURAL 5 PUERTAS',precios:{2024:27636500,2023:26254700,2022:24941900,2021:23694800}},
+{marca:'RENAULT',modelo:'DUSTER INTENS 1.6 MT',tipo:'RURAL 5 PUERTAS',precios:{'0Km':38640000,2025:33259950,2024:27879900,2023:26486000,2022:25161700,2021:23903600}},
+{marca:'RENAULT',modelo:'DUSTER OUTSIDER 1.3T CVT',tipo:'RURAL 5 PUERTAS',precios:{2024:28641600,2023:27209500,2022:25849100}},
+{marca:'RENAULT',modelo:'DUSTER ZEN 1.6',tipo:'RURAL 5 PUERTAS',precios:{2024:23552000,2023:22374500,2022:21255700}},
+{marca:'RENAULT',modelo:'DUSTER PH2 DAKAR 2.0 4X4',tipo:'TODO TERRENO',precios:{2024:22751600,2023:21613900,2022:20533200,2021:19506600}},
+{marca:'RENAULT',modelo:'DUSTER PH2 DYNAMIQUE 1.6',tipo:'RURAL 5 PUERTAS',precios:{2024:20738600,2023:19701800,2022:18716700,2021:17780800,2020:16891800,2019:16047200,2018:15244800}},
+{marca:'RENAULT',modelo:'DUSTER PH2 EXPRESSION 2.0 4X4',tipo:'TODO TERRENO',precios:{2024:21958600,2023:20860600,2022:19817600,2021:18826700,2020:17885400,2019:16991100,2018:16141500}},
+{marca:'RENAULT',modelo:'DUSTER PH2 PRIVILEGE 1.6',tipo:'RURAL 5 PUERTAS',precios:{2024:21348600,2023:20281100,2022:19267100,2021:18303800,2020:17388600,2019:16519200,2018:15693200}},
+{marca:'RENAULT',modelo:'DUSTER PH2 PRIVILEGE 2.0 4X4',tipo:'TODO TERRENO',precios:{2024:27050400,2023:25252300,2022:22727100,2021:21590700,2020:20511200,2019:19485600,2018:18511400}},
+{marca:'RENAULT',modelo:'DUSTER OROCH DYNAMIQUE 1.6',tipo:'PICK-UP CABINA DOBLE',precios:{2023:23868000,2022:22674600,2021:21540900,2020:18808000,2019:17867500,2018:16974200,2017:16125500}},
+{marca:'RENAULT',modelo:'DUSTER OROCH DYNAMIQUE 2.0',tipo:'PICK-UP CABINA DOBLE',precios:{2023:25321600,2022:24055500,2021:22852800,2020:19953300,2019:18955700,2018:18007900,2017:17107500}},
+{marca:'RENAULT',modelo:'DUSTER OROCH DYNAMIQUE 2.0 4X4',tipo:'PICK-UP CABINA DOBLE',precios:{2023:27669500,2022:26286100,2021:24971800,2020:21803600,2019:20713400}},
+{marca:'RENAULT',modelo:'DUSTER OROCH OUTSIDER 1.6',tipo:'PICK-UP CABINA DOBLE',precios:{2023:24584000,2022:23354900,2021:22187000,2020:19372200,2019:18403500,2018:17483400,2017:16609200}},
+{marca:'RENAULT',modelo:'DUSTER OROCH OUTSIDER PLUS 2.0',tipo:'PICK-UP CABINA DOBLE',precios:{2023:26863600,2022:25520500,2021:24244500,2020:21168500,2019:20110100,2018:19104600,2017:18149400}},
+{marca:'RENAULT',modelo:'DUSTER OROCH OUTSIDER PLUS 2.0 4X4',tipo:'PICK-UP CABINA DOBLE',precios:{2023:28499600,2022:27074600,2021:25721000,2020:22457700,2019:21334800}},
+{marca:'RENAULT',modelo:'DUSTER OROCH PRIVILEGE 2.0',tipo:'PICK-UP CABINA DOBLE',precios:{2023:26081200,2022:24777200,2021:23538300,2020:20552000,2019:19524300,2018:18548100,2017:17620700}},
+{marca:'RENAULT',modelo:'OROCH EMOTION 1.6 SCE 2WD',tipo:'PICK-UP CABINA DOBLE',precios:{'0Km':39910000,2025:34210550,2024:28511100,2023:27085600,2022:25731300}},
+{marca:'RENAULT',modelo:'OROCH ICONIC 1.3 TCE 2WD CVT',tipo:'PICK-UP CABINA DOBLE',precios:{'0Km':44400000,2025:37681850,2024:30963700,2023:29415500,2022:27944700}},
+{marca:'RENAULT',modelo:'OROCH OUTSIDER 1.3 TCE 4WD',tipo:'PICK-UP CABINA DOBLE',precios:{'0Km':45700000,2025:38782700,2024:31865400,2023:30272100,2022:28758500}},
+{marca:'RENAULT',modelo:'FLUENCE 2.0 16V DYNAMIQUE',tipo:'SEDAN 4 PUERTAS',precios:{2019:11995000,2018:11395000,2017:10826000,2016:10284000,2015:9770000,2014:9282000}},
+{marca:'RENAULT',modelo:'FLUENCE 2.0 16V LUXE',tipo:'SEDAN 4 PUERTAS',precios:{2019:16965000,2018:16117000,2017:15311000,2016:14546000,2015:13818000,2014:13127000,2013:12471000,2012:11847000,2011:11255000,2010:10692000}},
+{marca:'RENAULT',modelo:'FLUENCE 2.0 16V PRIVILEGE',tipo:'SEDAN 4 PUERTAS',precios:{2019:18564000,2018:17635800,2017:16754000,2016:15916300,2015:15120500,2014:14364500,2013:13646300,2012:12963900,2011:12315800,2010:11700000}},
+{marca:'RENAULT',modelo:'FLUENCE PH2 2.0 GT',tipo:'SEDAN 4 PUERTAS',precios:{2019:19624800,2018:18643600,2017:17711400,2016:16825800,2015:15984500}},
+{marca:'RENAULT',modelo:'FLUENCE PH2 2.0 LUXE',tipo:'SEDAN 4 PUERTAS',precios:{2019:16965000,2018:16117000,2017:15311000,2016:14546000,2015:13818000,2014:13127000,2013:12471000,2012:11847000,2011:11255000,2010:10692000}},
+{marca:'RENAULT',modelo:'FLUENCE PH2 2.0 PRIVILEGE',tipo:'SEDAN 4 PUERTAS',precios:{2019:18564000,2018:17635800,2017:16754000,2016:15916300,2015:15120500,2014:14364500,2013:13646300,2012:12963900,2011:12315800,2010:11700000}},
+{marca:'RENAULT',modelo:'KANGOO E-TECH ELECTRICA',tipo:'FURGONETA',precios:{'0Km':49810000,2025:44905000,2024:40000000}},
+{marca:'RENAULT',modelo:'KANGOO II STEPWAY 1.5 DCI',tipo:'SEDAN 5 PUERTAS',precios:{'0Km':38637000,2025:32335000,2024:26033000,2023:24794000,2022:23554000,2021:22376000,2020:21258000,2019:20195000,2018:19185000}},
+{marca:'RENAULT',modelo:'KANGOO II STEPWAY 1.6 SCE',tipo:'SEDAN 5 PUERTAS',precios:{'0Km':38200000,2025:31806150,2024:25412300,2023:24202200,2022:22992000,2021:21842400,2020:20750300,2019:19712800,2018:18727200}},
+{marca:'RENAULT',modelo:'KANGOO II ZEN 1.6 SCE',tipo:'SEDAN 5 PUERTAS',precios:{'0Km':36083000,2025:31351500,2024:26620000,2023:25352000,2022:24084000,2021:22880000,2020:21736000,2019:20649000,2018:19617000}},
+{marca:'RENAULT',modelo:'KANGOO EXPRESS 2A 1.5 DCI',tipo:'FURGON',precios:{'0Km':41970000,2025:34918050,2024:27866100,2023:26539100,2022:24416000,2021:22462800,2020:20665700,2019:19012400,2018:17491400}},
+{marca:'RENAULT',modelo:'KANGOO EXPRESS 2A 1.6 SCE',tipo:'FURGON',precios:{'0Km':39050000,2025:32637800,2024:26225600,2023:24976700,2022:22978600,2021:21140300,2020:19449000,2019:17893100,2018:16461700}},
+{marca:'RENAULT',modelo:'KANGOO EXPRESS 5A 1.5 DCI',tipo:'FURGON',precios:{'0Km':46100000,2025:38353500,2024:30607000,2023:29149500,2022:26817500,2021:24672100,2020:22698400,2019:20882500,2018:19211900}},
+{marca:'RENAULT',modelo:'KANGOO EXPRESS 5A 1.6 SCE',tipo:'FURGON',precios:{'0Km':43130000,2025:36056150,2024:28982300,2023:27602200,2022:25394100,2021:23362600,2020:21493600,2019:19774000,2018:18192100}},
+{marca:'RENAULT',modelo:'KARDIAN EVOLUTION 156 MT',tipo:'SEDAN 5 PUERTAS',precios:{'0Km':34580000,2025:29954100,2024:25328200}},
+{marca:'RENAULT',modelo:'KARDIAN EVOLUTION 200 EDC',tipo:'SEDAN 5 PUERTAS',precios:{'0Km':37640000,2025:32273100,2024:26906200}},
+{marca:'RENAULT',modelo:'KARDIAN ICONIC 200 EDC',tipo:'RURAL 5 PUERTAS',precios:{'0Km':41530000,2025:37377000}},
+{marca:'RENAULT',modelo:'KARDIAN PREMIERE EDITION 200 EDC',tipo:'SEDAN 5 PUERTAS',precios:{'0Km':41410000,2025:35726950,2024:30043900}},
+{marca:'RENAULT',modelo:'KARDIAN TECHNO 200 EDC',tipo:'SEDAN 5 PUERTAS',precios:{'0Km':39350000,2025:33948600,2024:28547200}},
+{marca:'RENAULT',modelo:'KOLEOS ESPRIT ALPINE FULL HYBRID E-TECH',tipo:'RURAL 5 PUERTAS',precios:{'0Km':85900000,2025:77310000}},
+{marca:'RENAULT',modelo:'KOLEOS INTENS 2.5 4WD CVT',tipo:'TODO TERRENO',precios:{'0Km':55020000,2025:47002200,2024:38984400,2023:37128000,2022:35006400,2021:32884800,2020:30763200,2019:29702400,2018:28641600}},
+{marca:'RENAULT',modelo:'KOLEOS PH2 INTENS 2.5 4WD CVT',tipo:'TODO TERRENO',precios:{'0Km':55020000,2025:47002200,2024:38984400,2023:37128000,2022:35006400,2021:32884800,2020:30763200,2019:29702400,2018:28641600}},
+{marca:'RENAULT',modelo:'KOLEOS PH3 PRIV 4X4 CVT',tipo:'TODO TERRENO',precios:{2024:18828800,2023:16966000,2022:15331300}},
+{marca:'RENAULT',modelo:'KOLEOS TECHNO',tipo:'RURAL 5 PUERTAS',precios:{'0Km':77900000,2025:70110000}},
+{marca:'RENAULT',modelo:'KOLEOS ZEN 2.5 2WD CVT',tipo:'RURAL 5 PUERTAS',precios:{2024:33586900,2023:31039000}},
+{marca:'RENAULT',modelo:'KWID E-TECH ELECTRICO',tipo:'SEDAN 5 PUERTAS',precios:{'0Km':31030000,2025:26988900,2024:22947800,2023:20652900}},
+{marca:'RENAULT',modelo:'KWID ICONIC 1.0',tipo:'SEDAN 5 PUERTAS',precios:{2025:16707600,2024:15872300,2023:15078600,2022:14324600,2021:13608400,2020:12928000}},
+{marca:'RENAULT',modelo:'KWID ICONIC BITONO 1.0',tipo:'SEDAN 5 PUERTAS',precios:{'0Km':23830000,2025:19977100,2024:16124200}},
+{marca:'RENAULT',modelo:'KWID ICONIC OUTSIDER 1.0',tipo:'SEDAN 5 PUERTAS',precios:{'0Km':23830000,2025:21447000}},
+{marca:'RENAULT',modelo:'KWID INTENS 1.0',tipo:'SEDAN 5 PUERTAS',precios:{2025:15912000,2024:15116400,2023:14360600,2022:13642500,2021:12960400,2020:12312400}},
+{marca:'RENAULT',modelo:'KWID LIFE 1.0',tipo:'SEDAN 5 PUERTAS',precios:{2024:11987000,2023:11387700,2022:10818300}},
+{marca:'RENAULT',modelo:'KWID OUTSIDER 1.0',tipo:'SEDAN 5 PUERTAS',precios:{2024:17543000,2023:16665800,2022:15832500,2021:15040900}},
+{marca:'RENAULT',modelo:'KWID ZEN 1.0',tipo:'SEDAN 5 PUERTAS',precios:{2025:15116400,2024:14360600,2023:13642500,2022:12960400,2021:12312400,2020:11696800}},
+{marca:'RENAULT',modelo:'LOGAN INTENS 1.6',tipo:'SEDAN 4 PUERTAS',precios:{'0Km':31380000,2025:29026500,2024:26673000}},
+{marca:'RENAULT',modelo:'LOGAN LIFE 1.6',tipo:'SEDAN 4 PUERTAS',precios:{'0Km':28960000,2025:26788000,2024:24616000}},
+{marca:'RENAULT',modelo:'LOGAN PH2 INTENS 1.6',tipo:'SEDAN 4 PUERTAS',precios:{2025:33730000,2024:28636450,2023:23542900,2022:19823300,2021:19245900,2020:18329500,2019:17329400,2018:16267700}},
+{marca:'RENAULT',modelo:'LOGAN PH2 INTENS 1.6 CVT',tipo:'SEDAN 4 PUERTAS',precios:{2024:20897600,2023:19902500,2022:18816500,2021:17663700}},
+{marca:'RENAULT',modelo:'LOGAN PH2 LIFE 1.6',tipo:'SEDAN 4 PUERTAS',precios:{2025:31130000,2024:26565500,2023:22001000,2022:17445600,2021:16937400,2020:16675000,2019:15765400,2018:14799400}},
+{marca:'RENAULT',modelo:'LOGAN PH2 ZEN 1.6',tipo:'SEDAN 4 PUERTAS',precios:{2025:32900000,2024:27932900,2023:22965800,2022:18947200,2021:18395400,2020:17519400,2019:16563600,2018:15548700}},
+{marca:'RENAULT',modelo:'MEGANE E-TECH ELECTRICO',tipo:'SEDAN 5 PUERTAS',precios:{'0Km':54450000,2025:50100100,2024:45750200}},
+{marca:'RENAULT',modelo:'MEGANE III 2.0 16V LUXE',tipo:'SEDAN 5 PUERTAS',precios:{2019:15135800,2018:14379100,2017:13660100,2016:12977100}},
+{marca:'RENAULT',modelo:'MEGANE III 2.0 16V PRIVILEGE',tipo:'SEDAN 5 PUERTAS',precios:{2019:15841000,2018:15049000,2017:14297000,2016:13582000}},
+{marca:'RENAULT',modelo:'MEGANE III RS 265 CV',tipo:'COUPE',precios:{2024:32400000,2023:31428000,2022:30485700,2021:29570400,2020:28683500,2019:27823500}},
+{marca:'RENAULT',modelo:'SANDERO INTENS 1.6',tipo:'SEDAN 5 PUERTAS',precios:{'0Km':34570000,2025:29029400,2024:23488800,2023:19349400,2022:18785800}},
+{marca:'RENAULT',modelo:'SANDERO INTENS 1.6 CVT',tipo:'SEDAN 5 PUERTAS',precios:{'0Km':35480000,2025:29790950,2024:24101900,2023:20522100,2022:19924300}},
+{marca:'RENAULT',modelo:'SANDERO LIFE 1.6',tipo:'SEDAN 5 PUERTAS',precios:{'0Km':32000000,2025:27144750,2024:22289500,2023:17883500,2022:17362700}},
+{marca:'RENAULT',modelo:'SANDERO ZEN 1.6',tipo:'SEDAN 5 PUERTAS',precios:{'0Km':22992800,2025:18763100,2024:18216500,2023:18199000,2022:18181300}},
+{marca:'RENAULT',modelo:'SANDERO PH2 INTENS 1.6',tipo:'SEDAN 5 PUERTAS',precios:{2025:34570000,2024:29029400,2023:23488800,2022:19349400,2021:18785800,2020:18767600,2019:18749400,2018:18731200}},
+{marca:'RENAULT',modelo:'SANDERO PH2 INTENS 1.6 CVT',tipo:'SEDAN 5 PUERTAS',precios:{2025:35480000,2024:29790950,2023:24101900,2022:20522100,2021:19924300,2020:19905100,2019:19885700,2018:19866500}},
+{marca:'RENAULT',modelo:'SANDERO PH2 LIFE 1.6',tipo:'SEDAN 5 PUERTAS',precios:{2025:32000000,2024:27144750,2023:22289500,2022:17883500,2021:17362700,2020:17345800,2019:17329000,2018:17312200}},
+{marca:'RENAULT',modelo:'SANDERO PH2 GT LINE 1.6',tipo:'SEDAN 5 PUERTAS',precios:{2024:19456500,2023:18889800,2022:17990300,2021:15951800}},
+{marca:'RENAULT',modelo:'SANDERO PH2 RS 2.0',tipo:'SEDAN 5 PUERTAS',precios:{2024:22501600,2023:21846200,2022:20805900,2021:18447800}},
+{marca:'RENAULT',modelo:'SANDERO PH2 ZEN 1.6',tipo:'SEDAN 5 PUERTAS',precios:{2025:22992800,2024:18763100,2023:18216500,2022:18199000,2021:18181300,2020:18163600}},
+{marca:'RENAULT',modelo:'SANDERO PH2 STEPWAY INTENS 1.6',tipo:'SEDAN 5 PUERTAS',precios:{2025:32020000,2024:28304400,2023:24588800,2022:23443700,2021:21297800,2020:19168100,2019:17251300,2018:15526200}},
+{marca:'RENAULT',modelo:'SANDERO PH2 STEPWAY INTENS 1.6 CVT',tipo:'SEDAN 5 PUERTAS',precios:{2025:33830000,2024:29304100,2023:24778200,2022:23655800,2021:22096000,2020:19886500,2019:17897800,2018:16108000}},
+{marca:'RENAULT',modelo:'SANDERO PH2 STEPWAY ZEN 1.6',tipo:'SEDAN 5 PUERTAS',precios:{2024:21806700,2023:19626000,2022:17663400,2021:15897000,2020:14307400}},
+{marca:'RENAULT',modelo:'STEPWAY INTENS 1.6',tipo:'SEDAN 5 PUERTAS',precios:{'0Km':32020000,2025:28304400,2024:24588800,2023:23443700,2022:21297800,2021:19168100,2020:17251300,2019:15526200}},
+{marca:'RENAULT',modelo:'STEPWAY INTENS 1.6 CVT',tipo:'SEDAN 5 PUERTAS',precios:{'0Km':33830000,2025:29304100,2024:24778200,2023:23655800,2022:22096000,2021:19886500,2020:17897800,2019:16108000}},
+{marca:'RENAULT',modelo:'STEPWAY ZEN 1.6',tipo:'SEDAN 5 PUERTAS',precios:{'0Km':21806700,2025:19626000,2024:17663400,2023:15897000,2022:14307400}},
+// FIAT
+{marca:'FIAT',modelo:'500',tipo:'SEDAN 3 PUERTAS',precios:{2021:17020000,2020:16169000,2019:15361000,2018:14592000,2017:13863000,2016:13170000,2015:12512000}},
+{marca:'FIAT',modelo:'500 1.2',tipo:'SEDAN 3 PUERTAS',precios:{2021:20467000,2020:19444000,2019:18472000,2018:17548000,2017:16671000,2016:15838000,2015:15046000}},
+{marca:'FIAT',modelo:'500 1.3 16V JTD',tipo:'SEDAN 3 PUERTAS',precios:{2014:13167000,2013:12508000,2012:11882000,2011:11288000}},
+{marca:'FIAT',modelo:'500 1.4 16V CABRIO',tipo:'DESCAPOTABLE',precios:{2021:26761000,2020:25423000,2019:24152000,2018:22944000,2017:21797000,2016:20707000,2015:19672000}},
+{marca:'FIAT',modelo:'500 1.4 16V LOUNGE',tipo:'SEDAN 3 PUERTAS',precios:{2025:25990000,2024:24691000}},
+{marca:'FIAT',modelo:'500 1.4 16V LOUNGE AUTOMATICO',tipo:'SEDAN 3 PUERTAS',precios:{2019:22317000,2018:21202000,2017:20142000,2016:19135000,2015:18177000,2014:17269000}},
+{marca:'FIAT',modelo:'500 1.4 16V SPORT',tipo:'SEDAN 3 PUERTAS',precios:{2022:22546000,2021:21419000,2020:20348000,2019:19331000,2018:18364000,2017:17446000,2016:16574000,2015:15745000,2014:14958000}},
+{marca:'FIAT',modelo:'500 1.4 16V SPORT AUTOMATICO',tipo:'SEDAN 3 PUERTAS',precios:{2016:16564000,2015:15736000,2014:14949000}},
+{marca:'FIAT',modelo:'500 1.4 8V CULT',tipo:'SEDAN 3 PUERTAS',precios:{2021:17020000,2020:16169000,2019:15361000,2018:14592000,2017:13863000,2016:13170000,2015:12512000}},
+{marca:'FIAT',modelo:'500 595 TURISMO',tipo:'SEDAN 3 PUERTAS',precios:{2022:35100000,2021:33345000,2020:31677800,2019:30094200}},
+{marca:'FIAT',modelo:'500 ABARTH 1.4 16V',tipo:'SEDAN 3 PUERTAS',precios:{2022:23590000,2021:22410000,2020:21289000}},
+{marca:'FIAT',modelo:'500 ABARTH 1.4 16V CONVERTIBLE',tipo:'DESCAPOTABLE',precios:{2021:22506000,2020:21381000}},
+{marca:'FIAT',modelo:'500 ABARTH 595 TURISMO',tipo:'SEDAN 3 PUERTAS',precios:{2022:35100000,2021:33345000,2020:31677800,2019:30094200}},
+{marca:'FIAT',modelo:'500 ABARTH 1.4 16V T-JET',tipo:'SEDAN 3 PUERTAS',precios:{2021:23043000,2020:21892000}},
+{marca:'FIAT',modelo:'500 AIR AT 1.4 16V CONVERTIBLE',tipo:'DESCAPOTABLE',precios:{2021:26761000,2020:25423000,2019:24152000,2018:22944000,2017:21797000,2016:20707000,2015:19672000}},
+{marca:'FIAT',modelo:'500 C 1.4 16V',tipo:'DESCAPOTABLE',precios:{2018:19124000,2017:18167000,2016:17259000}},
+{marca:'FIAT',modelo:'500 LOUNGE 1.2',tipo:'SEDAN 3 PUERTAS',precios:{2019:22317000,2018:21202000,2017:20142000,2016:19135000,2015:18177000,2014:17269000}},
+{marca:'FIAT',modelo:'500 SPORT 16V',tipo:'SEDAN 3 PUERTAS',precios:{2014:13167000,2013:12508000,2012:11882000,2011:11288000}},
+{marca:'FIAT',modelo:'500 SPORT AIR 1.4 16V',tipo:'SEDAN 3 PUERTAS',precios:{2016:16564000,2015:15736000,2014:14949000}},
+{marca:'FIAT',modelo:'500L',tipo:'SEDAN 5 PUERTAS',precios:{2018:18599000,2017:17669000,2016:16786000,2015:15946000}},
+{marca:'FIAT',modelo:'500L 1.4 16V',tipo:'SEDAN 5 PUERTAS',precios:{2018:18599000,2017:17669000,2016:16786000,2015:15946000}},
+{marca:'FIAT',modelo:'500X',tipo:'SEDAN 5 PUERTAS',precios:{2019:25241000,2018:23979000,2017:22780000}},
+{marca:'FIAT',modelo:'500X CROSS 1.4 16V AT9',tipo:'TODO TERRENO',precios:{2020:31050000,2019:28350000}},
+{marca:'FIAT',modelo:'500X POP 1.4 16V',tipo:'SEDAN 5 PUERTAS',precios:{2019:25241000,2018:23979000,2017:22780000}},
+{marca:'FIAT',modelo:'600 HYBRID 1.2 EDCT',tipo:'SEDAN 5 PUERTAS',precios:{'0Km':39000000}},
+{marca:'FIAT',modelo:'ARGO DRIVE 1.3',tipo:'SEDAN 5 PUERTAS',precios:{2024:23422000,2023:21079800,2022:18592000,2021:18088000,2020:17719000,2019:17214000,2018:16395000,2017:15575000,2016:14796000}},
+{marca:'FIAT',modelo:'ARGO HGT 1.8',tipo:'SEDAN 5 PUERTAS',precios:{2024:25353000,2023:24146000,2022:22996000,2021:21901000,2020:20806000,2019:19766000}},
+{marca:'FIAT',modelo:'ARGO PRECISION 1.8',tipo:'SEDAN 5 PUERTAS',precios:{2024:22476000,2023:21406000,2022:20387000,2021:19416000,2020:18445000,2019:17523000}},
+{marca:'FIAT',modelo:'ARGO PRECISION 1.8 AT6',tipo:'SEDAN 5 PUERTAS',precios:{2024:26055000,2023:24815000,2022:23633000,2021:22508000,2020:21382000,2019:20313000}},
+{marca:'FIAT',modelo:'BRAVO 1.4 16V DYNAMIC',tipo:'SEDAN 5 PUERTAS',precios:{2014:11755500,2013:11114300,2012:10756700,2011:10513700}},
+{marca:'FIAT',modelo:'BRAVO 1.4 16V SPORT',tipo:'SEDAN 5 PUERTAS',precios:{2014:11358600,2013:10999900,2012:10756700}},
+{marca:'FIAT',modelo:'BRAVO DYNAMIC 1.4 TURBO',tipo:'SEDAN 5 PUERTAS',precios:{2014:11755500,2013:11114300,2012:10756700,2011:10513700}},
+{marca:'FIAT',modelo:'BRAVO DYNAMIC 1.6 MULTIJET',tipo:'SEDAN 5 PUERTAS',precios:{2013:11236500,2012:10878300,2011:10635200}},
+{marca:'FIAT',modelo:'BRAVO SPORT 1.4 TURBO',tipo:'SEDAN 5 PUERTAS',precios:{2013:11358600,2012:10999900,2011:10756700}},
+{marca:'FIAT',modelo:'CRONOS 1.3 GSE BZ',tipo:'SEDAN 4 PUERTAS',precios:{2024:22143000,2023:18934500,2022:15726000,2021:14939000,2020:14192000}},
+{marca:'FIAT',modelo:'CRONOS DRIVE 1.3 GSE BZ',tipo:'SEDAN 4 PUERTAS',precios:{'0Km':34100000,2025:29158700,2024:24217400,2023:23006600,2022:21856200}},
+{marca:'FIAT',modelo:'CRONOS DRIVE 1.3 GSE CVT BZ',tipo:'SEDAN 4 PUERTAS',precios:{'0Km':33358000,2025:27866000,2024:22374000,2023:21255000,2022:20193000}},
+{marca:'FIAT',modelo:'CRONOS DRIVE 1.3 MT',tipo:'SEDAN 4 PUERTAS',precios:{2024:19500000,2023:18000000,2022:16500000,2021:15000000,2020:13500000,2019:12750000}},
+{marca:'FIAT',modelo:'CRONOS LIKE 1.3 GSE BZ',tipo:'SEDAN 4 PUERTAS',precios:{'0Km':28519000,2025:24098150,2024:19677300,2023:18693500}},
+{marca:'FIAT',modelo:'CRONOS PRECISION 1.3 GSE CVT BZ',tipo:'SEDAN 4 PUERTAS',precios:{'0Km':35546000,2025:30036300,2024:24526600,2023:23300300,2022:22135300}},
+{marca:'FIAT',modelo:'CRONOS PRECISION 1.8 AT',tipo:'SEDAN 4 PUERTAS',precios:{2024:26201800,2023:24891700,2022:23647100,2021:22464700,2020:21341500,2019:20274400}},
+{marca:'FIAT',modelo:'CRONOS PRECISION 1.8 MT',tipo:'SEDAN 4 PUERTAS',precios:{2024:20685600,2023:19651300,2022:18668700,2021:17735300,2020:16848500,2019:16006100}},
+{marca:'FIAT',modelo:'CRONOS STILE 1.3 GSE BZ',tipo:'SEDAN 4 PUERTAS',precios:{2024:27226000,2023:25117550,2022:23009100,2021:21858600}},
+{marca:'FIAT',modelo:'DOBLO 1.4 16V',tipo:'FAMILIAR',precios:{2019:11684000,2018:10911000,2017:10239000,2016:9574000,2015:8995000}},
+{marca:'FIAT',modelo:'DOBLO 1.9 ELX',tipo:'FAMILIAR',precios:{2012:8017000,2011:7777000,2010:7544000,2009:7282000,2008:7063000,2007:6851000,2006:6646000,2005:6415000,2004:6222000}},
+{marca:'FIAT',modelo:'DOBLO CARGO 1.4 16V',tipo:'FURGON',precios:{2020:16168000,2019:14866000,2018:13736000,2017:12701000,2016:11853000,2015:11069000,2014:10388000,2013:9713000,2012:9126000,2011:8545000}},
+{marca:'FIAT',modelo:'DUCATO 180 MULTIJET',tipo:'FURGON',precios:{2021:19619100,2020:18737300,2019:17879000,2018:17001500,2017:16154800}},
+{marca:'FIAT',modelo:'DUCATO CARGO 2.3 JTD',tipo:'FURGON',precios:{2021:23716200,2020:22259400,2019:21042800,2018:19839500,2017:19012900,2016:18098300,2015:17275600,2014:16373100}},
+{marca:'FIAT',modelo:'DUCATO CARGO MEDIO L2H1 2.3 MULTIJET',tipo:'FURGON',precios:{2024:48041000,2023:46953000,2022:45865000,2021:43572000,2020:41393000,2019:39324000,2018:37358000,2017:35490000}},
+{marca:'FIAT',modelo:'DUCATO CARGO PASO CORTO L1H1 2.3',tipo:'FURGON',precios:{2024:45426000,2023:44398000,2022:43370000,2021:41201000,2020:39141000,2019:37184000,2018:35325000,2017:33558000}},
+{marca:'FIAT',modelo:'DUCATO CHASIS CABINA 2.3',tipo:'CHASIS C/CABINA',precios:{2024:41446000,2023:40507500,2022:39569000,2021:37591000,2020:35711000,2019:33926000,2018:32229000,2017:30618000}},
+{marca:'FIAT',modelo:'DUCATO COMBINATO 2.3 JTD',tipo:'TRANS.DE PASAJEROS',precios:{2023:26539600,2022:25041800,2021:23811600,2020:22594900,2019:21823500,2018:20621100,2017:19304900,2016:18228800,2015:17464700}},
+{marca:'FIAT',modelo:'DUCATO MAXI CARGO L4H2',tipo:'FURGON',precios:{2024:50167000,2023:49031000,2022:47895000,2021:45500000,2020:43225000,2019:41064000,2018:39011000,2017:37060000}},
+{marca:'FIAT',modelo:'DUCATO MAXICARGO 2.3 JTD',tipo:'FURGON',precios:{2021:26930500,2020:25184300,2019:23706400,2018:22482600,2017:21272400,2016:20170200,2015:18975800,2014:18098300,2013:17137200,2012:16373100}},
+{marca:'FIAT',modelo:'FASTBACK ABARTH TURBO 270 AT6',tipo:'RURAL 5 PUERTAS',precios:{'0Km':45964000,2025:39871800,2024:33779600}},
+{marca:'FIAT',modelo:'FASTBACK TURBO 270 AT',tipo:'RURAL 5 PUERTAS',precios:{'0Km':42117000,2025:36444800,2024:30772600,2023:28609800}},
+{marca:'FIAT',modelo:'FIORINO',tipo:'FURGONETA',precios:{2008:7253000,2007:6891000,2006:6546000,2005:6219000,2004:5908000,2003:5612000,2002:5332000}},
+{marca:'FIAT',modelo:'FIORINO 1.3 MPI 8V FIRE',tipo:'FURGONETA',precios:{2015:7253000,2014:6891000,2013:6546000,2012:6219000,2011:5908000,2010:5612000,2009:5332000,2008:5065000,2007:4812000,2006:4571000,2005:4343000}},
+{marca:'FIAT',modelo:'FIORINO 1.3 MULTIJET',tipo:'FAMILIAR',precios:{2015:7401000,2014:7031000,2013:6679000,2012:6345000,2011:6028000,2010:5726000,2009:5440000,2008:5168000,2007:4910000,2006:4664000,2005:4431000}},
+{marca:'FIAT',modelo:'FIORINO ENDURANCE 1.3 MT',tipo:'FURGONETA',precios:{'0Km':27459000,2025:24713100}},
+{marca:'FIAT',modelo:'FIORINO ENDURANCE 1.4 MT',tipo:'FURGONETA',precios:{2023:18926200,2022:17871400,2021:16977800,2020:16128900,2019:15322500,2018:14556400,2017:13828600,2016:13137200,2015:12480300,2014:11856200,2013:11263400}},
+{marca:'FIAT',modelo:'FIORINO QUBO 1.4 8V ACTIVE',tipo:'FURGONETA',precios:{2016:7193000,2015:6833000,2014:6443000,2013:6174000}},
+{marca:'FIAT',modelo:'FIORINO QUBO 1.4 8V DYNAMIC',tipo:'FURGONETA',precios:{2016:7860000,2015:7463000,2014:7103000,2013:6711000,2012:6443000,2011:5699000}},
+{marca:'FIAT',modelo:'GRAND SIENA ATTRACTIVE 1.4',tipo:'SEDAN 4 PUERTAS',precios:{2018:9836000,2017:9368000,2016:8922000,2015:8497000,2014:8092000,2013:7707000,2012:7322000}},
+{marca:'FIAT',modelo:'GRAND SIENA ESSENCE 1.6 16V',tipo:'SEDAN 4 PUERTAS',precios:{2018:11242000,2017:10706000,2016:10197000,2015:9711000,2014:9249000,2013:8808000,2012:8368000}},
+{marca:'FIAT',modelo:'GRAND SIENA ESSENCE 1.6 16V DUALOGIC',tipo:'SEDAN 4 PUERTAS',precios:{2018:12647000,2017:12045000,2016:11471000,2015:10925000,2014:10405000,2013:9909000,2012:9414000}},
+{marca:'FIAT',modelo:'IDEA 1.4',tipo:'SEDAN 5 PUERTAS',precios:{2012:4908000,2011:4744000,2010:4366000}},
+{marca:'FIAT',modelo:'IDEA ADVENTURE 1.6 16V',tipo:'SEDAN 5 PUERTAS',precios:{2017:7962000,2016:7506000,2015:7055000,2014:6723000,2013:6443000,2012:6112000,2011:5836000,2010:5672000}},
+{marca:'FIAT',modelo:'IDEA ATTRACTIVE 1.4 8V',tipo:'SEDAN 5 PUERTAS',precios:{2018:7040000,2017:6547000,2016:6225000,2015:5851000,2014:5575000,2013:5286000,2012:5055000,2011:4767000,2010:4571000,2009:4353000,2008:4187000}},
+{marca:'FIAT',modelo:'IDEA ESSENCE 1.6 16V',tipo:'SEDAN 5 PUERTAS',precios:{2015:6557000,2014:6183000,2013:5906000,2012:5617000,2011:5384000,2010:5096000}},
+{marca:'FIAT',modelo:'IDEA SPORTING 1.6 16V',tipo:'SEDAN 5 PUERTAS',precios:{2014:5947000,2013:5713000,2012:5507000}},
+{marca:'FIAT',modelo:'LINEA 1.9 16V',tipo:'SEDAN 4 PUERTAS',precios:{2010:5014000,2009:4850000,2008:4767000}},
+{marca:'FIAT',modelo:'LINEA ABSOLUTE 1.8 16V',tipo:'SEDAN 4 PUERTAS',precios:{2015:8213000,2014:7756000,2013:7304000,2012:6474000,2011:6112000,2010:5782000,2009:5425000}},
+{marca:'FIAT',modelo:'LINEA ABSOLUTE 1.8 16V DUALOGIC',tipo:'SEDAN 4 PUERTAS',precios:{2015:8930000,2014:8381000,2013:7923000,2012:7470000,2011:6640000,2010:6277000,2009:5947000,2008:5589000}},
+{marca:'FIAT',modelo:'LINEA HLX 1.8 16V',tipo:'SEDAN 4 PUERTAS',precios:{2015:8504000,2014:7962000,2013:7506000,2012:7055000,2011:6225000,2010:5864000,2009:5534000,2008:5178000}},
+{marca:'FIAT',modelo:'MOBI 1.0 8V EASY',tipo:'SEDAN 5 PUERTAS',precios:{2022:14108000,2021:13402000,2020:12732000,2019:12096000,2018:11491000,2017:10916000,2016:10371000,2015:9852000}},
+{marca:'FIAT',modelo:'MOBI 1.0 8V WAY',tipo:'SEDAN 5 PUERTAS',precios:{2022:15895000,2021:15100000,2020:14345000,2019:13628000,2018:12946000,2017:12299000,2016:11684000,2015:11100000}},
+{marca:'FIAT',modelo:'MOBI LIKE 1.0',tipo:'SEDAN 5 PUERTAS',precios:{2024:18935300,2023:18033600,2022:17131900,2021:16275400}},
+{marca:'FIAT',modelo:'MOBI TREKKING 1.0',tipo:'SEDAN 5 PUERTAS',precios:{'0Km':24964000,2025:21498800,2024:18033600,2023:17503200}},
+{marca:'FIAT',modelo:'NUEVO FIORINO 1.4 8V',tipo:'FURGONETA',precios:{2023:18926200,2022:17871400,2021:16977800,2020:16128900,2019:15322500,2018:14556400,2017:13828600,2016:13137200,2015:12480300,2014:11856200,2013:11263400}},
+{marca:'FIAT',modelo:'NUEVO PUNTO ATTRACTIVE 1.4',tipo:'SEDAN 5 PUERTAS',precios:{2018:8111000,2017:7539000,2016:7062000,2015:6532000,2014:6149000,2013:4656000,2012:4371000,2011:4196000}},
+{marca:'FIAT',modelo:'NUEVO PUNTO ESSENCE 1.6 16V',tipo:'SEDAN 5 PUERTAS',precios:{2018:8557000,2017:7983000,2016:7503000,2015:6974000,2014:6588000,2013:5792000,2012:5594000}},
+{marca:'FIAT',modelo:'NUEVO PUNTO ESSENCE 1.6 16V DUALOGIC',tipo:'SEDAN 5 PUERTAS',precios:{2018:8735000,2017:8160000,2016:7680000,2015:7150000,2014:6764000,2013:6061000,2012:5764000}},
+{marca:'FIAT',modelo:'NUEVO UNO ATTRACTIVE 1.4 8V',tipo:'SEDAN 5 PUERTAS',precios:{2019:7288000,2018:6838000,2017:6547000,2016:6289000,2015:5951000,2014:5797000,2013:5667000,2012:5565000}},
+{marca:'FIAT',modelo:'NUEVO UNO SPORTING 1.4 8V',tipo:'SEDAN 5 PUERTAS',precios:{2018:7097000,2017:6805000,2016:6444000,2015:6208000,2014:6105000,2013:5973000}},
+{marca:'FIAT',modelo:'NUEVO UNO WAY 1.4 8V',tipo:'SEDAN 5 PUERTAS',precios:{2018:6889000,2017:6599000,2016:6238000,2015:6002000,2014:5848000,2013:5718000,2012:5616000}},
+{marca:'FIAT',modelo:'PALIO 1.4',tipo:'SEDAN 5 PUERTAS',precios:{2012:4548000,2011:4404000,2010:4213000}},
+{marca:'FIAT',modelo:'PALIO 1.4 FIRE',tipo:'SEDAN 5 PUERTAS',precios:{2017:5511000,2016:4859000,2015:4570000,2014:4356000,2013:4165000,2012:4069000,2011:3973000,2010:3859000}},
+{marca:'FIAT',modelo:'PALIO ADVENTURE 1.6 16V',tipo:'RURAL 5 PUERTAS',precios:{2018:8411000,2017:8082000,2016:7601000,2015:7181000,2014:6606000}},
+{marca:'FIAT',modelo:'PALIO ADVENTURE 1.6 16V DUALOGIC',tipo:'RURAL 5 PUERTAS',precios:{2018:8605000,2017:8274000,2016:7793000,2015:7372000,2014:6798000}},
+{marca:'FIAT',modelo:'PALIO ADVENTURE 1.8MPI 8V',tipo:'RURAL 5 PUERTAS',precios:{2017:6088000,2016:5724000,2015:5438000,2014:5166000,2013:4908000,2012:4662000,2011:4429000,2010:4208000}},
+{marca:'FIAT',modelo:'PALIO ATTRACTIVE 1.0',tipo:'SEDAN 5 PUERTAS',precios:{2020:13871100,2019:12606900,2018:11789300,2017:10980500,2016:10078000,2015:9729900,2014:9280900}},
+{marca:'FIAT',modelo:'PALIO ATTRACTIVE 1.4 8V',tipo:'SEDAN 5 PUERTAS',precios:{2018:8916000,2017:8103000,2016:7577000,2015:7058000,2014:6478000,2013:6254000,2012:5965000}},
+{marca:'FIAT',modelo:'PALIO ELX 1.4 8V',tipo:'SEDAN 5 PUERTAS',precios:{2017:4644000,2016:4500000,2015:4309000,2014:4165000,2013:4097000,2012:4002000}},
+{marca:'FIAT',modelo:'PALIO ESSENCE 1.6 16V',tipo:'SEDAN 5 PUERTAS',precios:{2018:8786000,2017:8257000,2016:7734000,2015:7348000,2014:6831000,2013:6350000}},
+{marca:'FIAT',modelo:'PALIO ESSENCE 1.6 16V DUALOGIC',tipo:'SEDAN 5 PUERTAS',precios:{2018:8982000,2017:8452000,2016:7928000,2015:7541000,2014:6927000,2013:6446000}},
+{marca:'FIAT',modelo:'PALIO FIRE 1.4',tipo:'SEDAN 5 PUERTAS',precios:{2020:7826000,2019:7273000,2018:6946000,2017:6623000,2016:6381000,2015:4763000,2014:4474000,2013:4261000,2012:4069000,2011:3973000,2010:3878000,2009:3764000}},
+{marca:'FIAT',modelo:'PALIO SPORTING 1.6 16V',tipo:'SEDAN 5 PUERTAS',precios:{2018:8937000,2017:8411000,2016:8024000,2015:7120000,2014:6831000}},
+{marca:'FIAT',modelo:'PALIO SPORTING 1.6 16V DUALOGIC',tipo:'SEDAN 5 PUERTAS',precios:{2018:8982000,2017:8452000,2016:7928000,2015:7541000,2014:6927000,2013:6446000}},
+{marca:'FIAT',modelo:'PALIO WEEKEND',tipo:'RURAL 5 PUERTAS',precios:{2018:7348000,2017:6961000,2016:6542000,2015:6254000,2014:5936000,2013:5649000,2012:5170000,2011:4979000,2010:4764000,2009:4669000}},
+{marca:'FIAT',modelo:'PALIO WEEKEND ADVENTURE 1.6 16V',tipo:'RURAL 5 PUERTAS',precios:{2018:8991000,2017:8508000,2016:8178000,2015:7697000,2014:7277000,2013:6702000}},
+{marca:'FIAT',modelo:'PALIO WEEKEND ATTRACTIVE 1.4 8V',tipo:'RURAL 5 PUERTAS',precios:{2018:7348000,2017:6961000,2016:6542000,2015:6254000,2014:5936000,2013:5649000,2012:5170000,2011:4979000,2010:4764000,2009:4669000}},
+{marca:'FIAT',modelo:'PALIO WEEKEND TREKKING 1.4 8V',tipo:'RURAL 5 PUERTAS',precios:{2018:7831000,2017:7444000,2016:7120000,2015:6831000,2014:6511000,2013:6223000}},
+{marca:'FIAT',modelo:'PANDA 4X4',tipo:'SEDAN 4 PUERTAS',precios:{2021:17020000,2020:16169000,2019:15361000,2018:14592000,2017:13863000,2016:13170000,2015:12512000}},
+{marca:'FIAT',modelo:'PANDA TREKKING',tipo:'SEDAN 4 PUERTAS',precios:{2022:14810000,2021:13967000,2020:12995000,2019:12111000,2018:11349000,2017:10514000,2016:9882000,2015:9398000,2014:8485000,2013:8099000,2012:7772000,2011:7484000}},
+{marca:'FIAT',modelo:'PULSE ABARTH T270 AT6',tipo:'RURAL 5 PUERTAS',precios:{'0Km':41296000,2025:36260050,2024:31224100,2023:29662900}},
+{marca:'FIAT',modelo:'PULSE AUDACE 1.0T CVT',tipo:'RURAL 5 PUERTAS',precios:{'0Km':38063000,2025:33282150,2024:28501300,2023:27076200}},
+{marca:'FIAT',modelo:'PULSE DRIVE 1.3 CVT',tipo:'RURAL 5 PUERTAS',precios:{'0Km':35224000,2025:30870700,2024:26517400,2023:25191500,2022:23931900}},
+{marca:'FIAT',modelo:'PULSE DRIVE 1.3 MT5',tipo:'RURAL 5 PUERTAS',precios:{'0Km':34015000,2025:29736300,2024:25457600,2023:24184700,2022:22975500}},
+{marca:'FIAT',modelo:'PULSE IMPETUS 1.0T CVT',tipo:'RURAL 5 PUERTAS',precios:{'0Km':39376000,2025:34429850,2024:29483700,2023:28009500,2022:26609000}},
+{marca:'FIAT',modelo:'PUNTO ATTRACTIVE 1.4 8V',tipo:'SEDAN 5 PUERTAS',precios:{2018:8111000,2017:7539000,2016:7062000,2015:6532000,2014:6149000,2013:4656000,2012:4371000,2011:4196000}},
+{marca:'FIAT',modelo:'PUNTO ESSENCE 1.6 16V',tipo:'SEDAN 5 PUERTAS',precios:{2018:8557000,2017:7983000,2016:7503000,2015:6974000,2014:6588000,2013:5792000,2012:5594000}},
+{marca:'FIAT',modelo:'PUNTO ESSENCE 1.6 16V DUALOGIC',tipo:'SEDAN 5 PUERTAS',precios:{2018:8735000,2017:8160000,2016:7680000,2015:7150000,2014:6764000,2013:6061000,2012:5764000}},
+{marca:'FIAT',modelo:'PUNTO SPORTING 1.6 16V',tipo:'SEDAN 5 PUERTAS',precios:{2017:8557000,2016:8249000,2015:7680000,2014:7150000,2013:6764000,2012:6413000}},
+{marca:'FIAT',modelo:'SIENA 1.4',tipo:'SEDAN 4 PUERTAS',precios:{2015:5032000,2014:4832000,2013:4656000,2012:4502000,2011:4371000,2010:4284000,2009:4196000,2008:4089000}},
+{marca:'FIAT',modelo:'SIENA 1.4 8V ATTRACTIVE',tipo:'SEDAN 4 PUERTAS',precios:{2018:6091000,2017:5798000,2016:5622000,2015:5420000,2014:5245000,2013:5092000,2012:4861000}},
+{marca:'FIAT',modelo:'SIENA 1.6 16V ESSENCE',tipo:'SEDAN 4 PUERTAS',precios:{2015:6149000,2014:5710000,2013:5508000,2012:5333000}},
+{marca:'FIAT',modelo:'SIENA 1.6 16V ESSENCE DUALOGIC',tipo:'SEDAN 4 PUERTAS',precios:{2015:5886000,2014:5798000,2013:5595000,2012:5420000}},
+{marca:'FIAT',modelo:'SIENA EL 1.4',tipo:'SEDAN 4 PUERTAS',precios:{2020:7688000,2019:7131000,2018:6741000,2017:6356000,2016:6003000,2015:5710000,2014:5534000,2013:5333000,2012:5158000,2011:4784000}},
+{marca:'FIAT',modelo:'SIENA EL 1.6',tipo:'SEDAN 4 PUERTAS',precios:{2019:8140000,2018:7577000,2017:7185000,2016:6797000,2015:6444000}},
+{marca:'FIAT',modelo:'SIENA ELX 1.4',tipo:'SEDAN 4 PUERTAS',precios:{2018:6091000,2017:5798000,2016:5622000,2015:5420000,2014:5245000,2013:5092000,2012:4861000}},
+{marca:'FIAT',modelo:'STRADA 1.3',tipo:'PICK-UP',precios:{2009:5061000,2008:4774000,2007:4488000}},
+{marca:'FIAT',modelo:'STRADA ADVENTURE 1.6',tipo:'PICK-UP CABINA DOBLE',precios:{2022:14810000,2021:13967000,2020:12995000,2019:12111000,2018:11349000,2017:10514000,2016:9882000,2015:9398000,2014:8485000,2013:8099000,2012:7772000,2011:7484000}},
+{marca:'FIAT',modelo:'STRADA ADVENTURE 1.6 16V CD',tipo:'PICK-UP',precios:{2018:9010000,2017:8485000,2016:8099000,2015:7772000,2014:7484000}},
+{marca:'FIAT',modelo:'STRADA ADVENTURE 1.6 16V CE',tipo:'PICK-UP',precios:{2019:10860000,2018:10125000,2017:9398000,2016:9010000,2015:8485000,2014:8099000,2013:7676000,2012:7292000}},
+{marca:'FIAT',modelo:'STRADA ENDURANCE 1.4 CD',tipo:'PICK-UP CABINA DOBLE',precios:{2024:21575300,2023:20547900,2022:19520600,2021:18544600,2020:17617300}},
+{marca:'FIAT',modelo:'STRADA ENDURANCE 1.4 CS',tipo:'PICK-UP CABINA SIMPLE',precios:{2024:19873800,2023:18927400,2022:17981000,2021:17081900,2020:16227800}},
+{marca:'FIAT',modelo:'STRADA FREEDOM 1.3 CD',tipo:'PICK-UP CABINA DOBLE',precios:{'0Km':34872000,2025:29141150,2024:23410300}},
+{marca:'FIAT',modelo:'STRADA FREEDOM 1.3 CS',tipo:'PICK-UP CABINA SIMPLE',precios:{'0Km':30555000,2025:27499500}},
+{marca:'FIAT',modelo:'STRADA FREEDOM 1.4 CD',tipo:'PICK-UP CABINA DOBLE',precios:{2024:23881600,2023:22744500,2022:21607200,2021:20526900,2020:19500500}},
+{marca:'FIAT',modelo:'STRADA FREEDOM TECH 1.4 CD',tipo:'PICK-UP CABINA DOBLE',precios:{2025:25600300,2024:24381200}},
+{marca:'FIAT',modelo:'STRADA RANCH 1.3 CVT',tipo:'PICK-UP CABINA DOBLE',precios:{'0Km':28795000,2025:27423800,2024:26052600}},
+{marca:'FIAT',modelo:'STRADA RANCH T200 CVT',tipo:'PICK-UP CABINA DOBLE',precios:{'0Km':42095000,2025:35469450,2024:28843900}},
+{marca:'FIAT',modelo:'STRADA TREKKING 1.4 CC',tipo:'PICK-UP',precios:{2018:7751000,2017:7424000,2016:7135000,2015:6813000,2014:6525000,2013:6237000}},
+{marca:'FIAT',modelo:'STRADA TREKKING 1.4 CS',tipo:'PICK-UP CABINA SIMPLE',precios:{2017:7654000,2016:7328000,2015:7039000,2014:6717000,2013:6429000,2012:6237000}},
+{marca:'FIAT',modelo:'STRADA TREKKING 1.6 CS',tipo:'PICK-UP CABINA SIMPLE',precios:{2017:7751000,2016:7424000,2015:7135000,2014:6813000,2013:6525000,2012:6333000}},
+{marca:'FIAT',modelo:'STRADA TREKKING 1.8 MPI 8V CM',tipo:'PICK-UP CABINA Y MEDIA',precios:{2018:6525000,2017:6333000,2016:6237000,2015:6141000,2014:6015000,2013:5920000,2012:5729000}},
+{marca:'FIAT',modelo:'STRADA ULTRA T200 CVT',tipo:'PICK-UP CABINA DOBLE',precios:{'0Km':42217000,2025:35572350,2024:28927700}},
+{marca:'FIAT',modelo:'STRADA VOLCANO 1.3 CD',tipo:'PICK-UP CABINA DOBLE',precios:{2024:26832600,2023:25554900,2022:24277100,2021:23063200,2020:21910100}},
+{marca:'FIAT',modelo:'STRADA VOLCANO 1.3 CVT',tipo:'PICK-UP CABINA DOBLE',precios:{'0Km':38946000,2025:32815650,2024:26685300,2023:25554900,2022:24277100}},
+{marca:'FIAT',modelo:'STRADA WORKING 1.4 CC',tipo:'PICK-UP',precios:{2018:7751000,2017:7424000,2016:7135000,2015:6813000,2014:6525000,2013:6237000}},
+{marca:'FIAT',modelo:'STRADA WORKING 1.4 CD',tipo:'PICK-UP CABINA DOBLE',precios:{2022:13145000,2021:12189000,2020:11416000,2019:10762000,2018:10222000,2017:9786000,2016:9398000,2015:8870000,2014:8485000}},
+{marca:'FIAT',modelo:'STRADA WORKING 1.4 CS',tipo:'PICK-UP CABINA SIMPLE',precios:{2022:11913000,2021:10980000,2020:10225000,2019:9588000,2018:9054000,2017:8623000,2016:8235000,2015:7424000,2014:7135000,2013:6813000,2012:6525000,2011:6237000}},
+{marca:'FIAT',modelo:'TIPO EASY 1.6 AT6',tipo:'SEDAN 4 PUERTAS',precios:{2020:12750000,2019:12000000}},
+{marca:'FIAT',modelo:'TIPO POP 1.6 AT6',tipo:'SEDAN 4 PUERTAS',precios:{2019:12000000,2018:11250000}},
+{marca:'FIAT',modelo:'TITANO ENDURANCE MT',tipo:'PICK-UP',precios:{'0Km':46726000,2025:42053400}},
+{marca:'FIAT',modelo:'TITANO ENDURANCE MT 4WD',tipo:'PICK-UP',precios:{'0Km':49454000,2025:44508600}},
+{marca:'FIAT',modelo:'TITANO FREEDOM MT 4WD',tipo:'PICK-UP',precios:{'0Km':54457000,2025:49011300}},
+{marca:'FIAT',modelo:'TITANO FREEDOM PLUS AT8 AWD',tipo:'PICK-UP',precios:{'0Km':59800000,2025:53820000}},
+{marca:'FIAT',modelo:'TITANO RANCH AT8 AWD',tipo:'PICK-UP',precios:{'0Km':64575000,2025:58117500}},
+{marca:'FIAT',modelo:'TORO ENDURANCE 2.0 AT9 4WD',tipo:'PICK-UP CABINA DOBLE',precios:{2024:30763200,2023:29225000,2022:27763800,2021:26375600,2020:25056800}},
+{marca:'FIAT',modelo:'TORO FREEDOM 1.3T CD AT6 4X2',tipo:'PICK-UP CABINA DOBLE',precios:{'0Km':43917000,2025:38135700,2024:32354400}},
+{marca:'FIAT',modelo:'TORO FREEDOM 1.8 16V 4X2 AT6',tipo:'PICK-UP CABINA DOBLE',precios:{2024:24398400,2023:23178500,2022:22019600,2021:20918600,2020:19872600}},
+{marca:'FIAT',modelo:'TORO FREEDOM 2.0 16V 4X2',tipo:'PICK-UP CABINA DOBLE',precios:{2021:20155200,2020:19147400,2019:18190100,2018:17280500}},
+{marca:'FIAT',modelo:'TORO FREEDOM 2.0 16V 4X4',tipo:'PICK-UP CABINA DOBLE',precios:{2021:22248000,2020:21135000,2019:20079000,2018:19075000}},
+{marca:'FIAT',modelo:'TORO FREEDOM 2.0 16V 4X4 AT9',tipo:'PICK-UP CABINA DOBLE',precios:{2024:30763200,2023:29225000,2022:27763800,2021:26375600,2020:25056800}},
+{marca:'FIAT',modelo:'TORO FREEDOM 2.0 CD AT9 4X4',tipo:'PICK-UP CABINA DOBLE',precios:{'0Km':38611200,2025:36772600,2024:33095400,2023:29785800}},
+{marca:'FIAT',modelo:'TORO RANCH 2.0 AT9 4WD',tipo:'PICK-UP CABINA DOBLE',precios:{2024:33945600,2023:32248300,2022:30635900,2021:29104100}},
+{marca:'FIAT',modelo:'TORO RANCH 2.0 CD AT9 4X4',tipo:'PICK-UP CABINA DOBLE',precios:{'0Km':44553600,2025:42432000,2024:38188800}},
+{marca:'FIAT',modelo:'TORO ULTRA 2.0 CD AT9 4X4',tipo:'PICK-UP CABINA DOBLE',precios:{'0Km':58722000,2025:51936800,2024:45151600,2023:43001500,2022:38701400,2021:34831300}},
+{marca:'FIAT',modelo:'TORO VOLCANO 1.3T CD AT6 4X2',tipo:'PICK-UP CABINA DOBLE',precios:{'0Km':49073000,2025:43042350,2024:37011700,2023:35249200,2022:31724300,2021:28551800}},
+{marca:'FIAT',modelo:'TORO VOLCANO 2.0 16V 4X4',tipo:'PICK-UP CABINA DOBLE',precios:{2024:31824000,2023:30232800,2022:28721200,2021:27285100,2020:25920900,2019:24624800,2018:23393600}},
+{marca:'FIAT',modelo:'TORO VOLCANO 2.0 CD AT9 4X4',tipo:'PICK-UP CABINA DOBLE',precios:{'0Km':52883000,2025:47118150,2024:41353300,2023:39384100,2022:35445700,2021:31901200}},
+{marca:'FIAT',modelo:'UNO 1.3 MPI 8V FIRE',tipo:'SEDAN 3 PUERTAS',precios:{2009:2255000,2008:2140000,2007:2002000}},
+{marca:'FIAT',modelo:'UNO 1.4 8V',tipo:'SEDAN 5 PUERTAS',precios:{2018:7288000,2017:6838000,2016:6547000,2015:6289000,2014:5951000,2013:5797000,2012:5667000,2011:5565000}},
+{marca:'FIAT',modelo:'UNO FIRE 1.0 IE',tipo:'SEDAN 5 PUERTAS',precios:{2013:4817000,2012:4601000,2011:4354000,2010:3112000,2009:3023000,2008:2934000,2007:2845000}},
+{marca:'FIAT',modelo:'UNO FIRE 1242 MPI 8V',tipo:'SEDAN 5 PUERTAS',precios:{2015:4726000,2014:4556000,2013:4309000,2012:4130000,2011:3842000,2010:3752000,2009:3618000,2008:3484000,2007:3334000,2006:3245000,2005:3112000,2004:3023000}},
+{marca:'FIAT',modelo:'UNO SPORTING 1.4 8V',tipo:'SEDAN 5 PUERTAS',precios:{2018:7097000,2017:6805000,2016:6444000,2015:6208000,2014:6105000,2013:5973000}},
+{marca:'FIAT',modelo:'UNO WAY 1.3',tipo:'SEDAN 5 PUERTAS',precios:{2022:13400000,2021:12762000,2020:12154000,2019:11575000}},
+{marca:'FIAT',modelo:'UNO WAY 1.4 8V',tipo:'SEDAN 5 PUERTAS',precios:{2018:6889000,2017:6599000,2016:6238000,2015:6002000,2014:5848000,2013:5718000,2012:5616000}},
+{marca:'FIAT',modelo:'WEEKEND ADVENTURE 1.6 16V',tipo:'RURAL 5 PUERTAS',precios:{2022:10953000,2021:10195000,2020:9548000,2019:9007000}},
+{marca:'FIAT',modelo:'WEEKEND ATTRACTIVE 1.4 8V',tipo:'RURAL 5 PUERTAS',precios:{2021:7957000,2020:7572000}},
+{marca:'FIAT',modelo:'WEEKEND TREKKING 1.6',tipo:'RURAL 5 PUERTAS',precios:{2022:10953000,2021:10195000,2020:9548000,2019:9007000}},
+// VW POLO
+{marca:'VOLKSWAGEN',modelo:'POLO CLASSIC 1.9 SDI 302 SEDAN 4 PUERTAS',tipo:'SEDAN 4 PUERTAS',precios:{'2010':5686700,'2009':5449800,'2008':5212800,'2007':4975900,'2006':4739000,'2005':4502000,'2004':4276900,'2003':4063100,'2002':3859900}},
+{marca:'VOLKSWAGEN',modelo:'POLO CLASSIC 1.9 SDI 312 SEDAN 4 PUERTAS',tipo:'SEDAN 4 PUERTAS',precios:{'2010':5686700,'2009':5449800,'2008':5212800,'2007':4975900,'2006':4739000,'2005':4502000,'2004':4276900,'2003':4063100,'2002':3859900}},
+{marca:'VOLKSWAGEN',modelo:'POLO CLASSIC 1.9 TDI',tipo:'SEDAN 4 PUERTAS',precios:{'2002':4833700}},
+{marca:'VOLKSWAGEN',modelo:'POLO CLASSIC 1.9 TDI 99A',tipo:'SEDAN 4 PUERTAS',precios:{'2002':4833700}},
+{marca:'VOLKSWAGEN',modelo:'POLO CLASSIC 1.9 TDI 99B',tipo:'SEDAN 4 PUERTAS',precios:{'2010':6634500,'2009':6397600,'2008':6160600,'2007':5923600,'2006':5686700,'2005':5402400,'2004':5132300,'2003':4875600,'2002':4631800}},
+{marca:'VOLKSWAGEN',modelo:'POLO CLASSIC 1.9L SD 30',tipo:'SEDAN 4 PUERTAS',precios:{'2010':5686700,'2009':5449800,'2008':5212800,'2007':4975900,'2006':4739000,'2005':4502000,'2004':4276900,'2003':4063100,'2002':3859900}},
+{marca:'VOLKSWAGEN',modelo:'POLO CLASSIC 1.9L SD 3012SEDAN 4 PUERTAS',tipo:'SEDAN 4 PUERTAS',precios:{'2010':5686700,'2009':5449800,'2008':5212800,'2007':4975900,'2006':4739000,'2005':4502000,'2004':4276900,'2003':4063100,'2002':3859900}},
+{marca:'VOLKSWAGEN',modelo:'POLO CLASSIC 1.9L SD 31A',tipo:'SEDAN 4 PUERTAS',precios:{'2010':6634500,'2009':6397600,'2008':6160600,'2007':5923600,'2006':5686700,'2005':5402400,'2004':5132300,'2003':4875600,'2002':4631800}},
+{marca:'VOLKSWAGEN',modelo:'POLO CLASSIC 1.9L SD 31B',tipo:'SEDAN 4 PUERTAS',precios:{'2010':6634500,'2009':6397600,'2008':6160600,'2007':5923600,'2006':5686700,'2005':5402400,'2004':5132300,'2003':4875600,'2002':4631800}},
+{marca:'VOLKSWAGEN',modelo:'POLO CLASSIC 1.9L SD 3A',tipo:'SEDAN 4 PUERTAS',precios:{'2010':6634500,'2009':6397600,'2008':6160600,'2007':5923600,'2006':5686700,'2005':5402400,'2004':5132300,'2003':4875600,'2002':4631800}},
+{marca:'VOLKSWAGEN',modelo:'POLO CLASSIC 1.9L TDI 30ASEDAN 4 PUERTAS',tipo:'SEDAN 4 PUERTAS',precios:{'2010':6634500,'2009':6397600,'2008':6160600,'2007':5923600,'2006':5686700,'2005':5402400,'2004':5132300,'2003':4875600,'2002':4631800}},
+{marca:'VOLKSWAGEN',modelo:'POLO CLASSIC 1.9L TDI 30BSEDAN 4 PUERTAS',tipo:'SEDAN 4 PUERTAS',precios:{'2010':6634500,'2009':6397600,'2008':6160600,'2007':5923600,'2006':5686700,'2005':5402400,'2004':5132300,'2003':4875600,'2002':4631800}},
+{marca:'VOLKSWAGEN',modelo:'POLO CLASSIC 1.9L TDI 31BSEDAN 4 PUERTAS',tipo:'SEDAN 4 PUERTAS',precios:{'2010':6634500,'2009':6397600,'2008':6160600,'2007':5923600,'2006':5686700,'2005':5402400,'2004':5132300,'2003':4875600,'2002':4631800}},
+{marca:'VOLKSWAGEN',modelo:'POLO CLASSIC 2.0 (3076) 101SEDAN 4 PUERTAS',tipo:'SEDAN 4 PUERTAS',precios:{'2004':5402400,'2003':5132300,'2002':4875600}},
+{marca:'VOLKSWAGEN',modelo:'POLO CLASSIC SD',tipo:'SEDAN 4 PUERTAS',precios:{'2010':5686700,'2009':5449800,'2008':5212800,'2007':4975900,'2006':4739000,'2005':4502000,'2004':4276900,'2003':4063100,'2002':3859900}},
+{marca:'VOLKSWAGEN',modelo:'POLO CLASSIC SD',tipo:'SEDAN 4 PUERTAS',precios:{'2002':4312900}},
+{marca:'VOLKSWAGEN',modelo:'POLO CLASSIC SD 97D',tipo:'SEDAN 4 PUERTAS',precios:{'2002':4312900}},
+{marca:'VOLKSWAGEN',modelo:'POLO CLASSIC SD 981',tipo:'SEDAN 4 PUERTAS',precios:{'2002':4312900}},
+{marca:'VOLKSWAGEN',modelo:'POLO CLASSIC SD 981',tipo:'SEDAN 4 PUERTAS',precios:{'2010':5686700,'2009':5449800,'2008':5212800,'2007':4975900,'2006':4739000,'2005':4502000,'2004':4276900,'2003':4063100,'2002':3859900}},
+{marca:'VOLKSWAGEN',modelo:'POLO CLASSIC SD 98C',tipo:'SEDAN 4 PUERTAS',precios:{'2002':4312900}},
+{marca:'VOLKSWAGEN',modelo:'POLO CLASSIC SD 98C',tipo:'SEDAN 4 PUERTAS',precios:{'2010':5686700,'2009':5449800,'2008':5212800,'2007':4975900,'2006':4739000,'2005':4502000,'2004':4276900,'2003':4063100,'2002':3859900}},
+{marca:'VOLKSWAGEN',modelo:'POLO CLASSIC SD 98D',tipo:'SEDAN 4 PUERTAS',precios:{'2002':4312900}},
+{marca:'VOLKSWAGEN',modelo:'POLO CLASSIC SD 98D',tipo:'SEDAN 4 PUERTAS',precios:{'2010':5686700,'2009':5449800,'2008':5212800,'2007':4975900,'2006':4739000,'2005':4502000,'2004':4276900,'2003':4063100,'2002':3859900}},
+{marca:'VOLKSWAGEN',modelo:'POLO COMFORTLINE 1.6 MSI 110CV',tipo:'SEDAN 5 PUERTAS',precios:{'2021':24020900,'2020':22819900,'2019':21678900,'2018':20594900,'2017':19565200}},
+{marca:'VOLKSWAGEN',modelo:'POLO COMFORTLINE 170TSI AT G1',tipo:'SEDAN 5 PUERTAS',precios:{'0Km':38482700,'2025':34634430}},
+{marca:'VOLKSWAGEN',modelo:'POLO COMFORTLINE PLUS 1.6 MSI 110CV AT',tipo:'SEDAN 5 PUERTAS',precios:{'2021':26280100,'2020':24966100,'2019':23717800,'2018':22531900}},
+{marca:'VOLKSWAGEN',modelo:'POLO GTS AT 1.4 TSI 150CV',tipo:'SEDAN 5 PUERTAS',precios:{'2023':31824000,'2022':30232800,'2021':28721200,'2020':27285100}},
+{marca:'VOLKSWAGEN',modelo:'POLO HIGHLINE 1.6 MSI 110CV',tipo:'SEDAN 5 PUERTAS',precios:{'2019':27226300,'2018':25489500}},
+{marca:'VOLKSWAGEN',modelo:'POLO HIGHLINE 1.6 MSI 110CV AT',tipo:'SEDAN 5 PUERTAS',precios:{'2023':29888000,'2022':28393700,'2021':26974000,'2020':25625300,'2019':24344000,'2018':23126800}},
+{marca:'VOLKSWAGEN',modelo:'POLO HIGHLINE 170TSI AT G1',tipo:'SEDAN 5 PUERTAS',precios:{'0Km':41626100,'2025':35719650,'2024':29813200,'2023':27846000}},
+{marca:'VOLKSWAGEN',modelo:'POLO HIGHLINE AT 1.6 110CV',tipo:'SEDAN 5 PUERTAS',precios:{'2023':29888000,'2022':28393700,'2021':26974000,'2020':25625300,'2019':24344000,'2018':23126800}},
+{marca:'VOLKSWAGEN',modelo:'POLO MSI 1.6 110CV',tipo:'SEDAN 5 PUERTAS',precios:{'2023':22623000,'2022':21491900,'2021':20417300,'2020':19396400}},
+{marca:'VOLKSWAGEN',modelo:'POLO MSI AT',tipo:'SEDAN 5 PUERTAS',precios:{'2023':23813700,'2022':22623000,'2021':21491900,'2020':20417300}},
+{marca:'VOLKSWAGEN',modelo:'POLO MSI AT 1.6 110CV',tipo:'SEDAN 5 PUERTAS',precios:{'2023':23813700,'2022':22623000,'2021':21491900,'2020':20417300}},
+{marca:'VOLKSWAGEN',modelo:'POLO MSI MT',tipo:'SEDAN 5 PUERTAS',precios:{'2023':22623000,'2022':21491900,'2021':20417300,'2020':19396400}},
+{marca:'VOLKSWAGEN',modelo:'POLO SDI BERLINE',tipo:'SEDAN 4 PUERTAS',precios:{'2010':6871500,'2009':6634500,'2008':6397600,'2007':6160600,'2006':5923600,'2005':5627400,'2004':5346100,'2003':5078800,'2002':4824900}},
+{marca:'VOLKSWAGEN',modelo:'POLO SERVO',tipo:'SEDAN 5 PUERTAS',precios:{'2010':5686700,'2009':5449800,'2008':5212800,'2007':4975900,'2006':4739000,'2005':4502000,'2004':4276900,'2003':4063100,'2002':3859900}},
+{marca:'VOLKSWAGEN',modelo:'POLO TRACK MSI MT G1',tipo:'SEDAN 5 PUERTAS',precios:{'0Km':33030200,'2025':28806350,'2024':24582500,'2023':22542000}},
+{marca:'VOLKSWAGEN',modelo:'POLO TREND MSI MT',tipo:'SEDAN 5 PUERTAS',precios:{'2023':21491900,'2022':20417300}},
+{marca:'VOLKSWAGEN',modelo:'POLO TRENDLINE 1.6 MSI 110CV',tipo:'SEDAN 5 PUERTAS',precios:{'2021':21285200,'2020':20220900,'2019':19209900,'2018':18249400,'2017':17336900}},
+{marca:'VOLKSWAGEN',modelo:'POLO TRENDLINE 1.6 MSI 110CV AT',tipo:'SEDAN 5 PUERTAS',precios:{'2021':22019200,'2020':20918200,'2019':19872300,'2018':18878700}},
+{marca:'VOLKSWAGEN',modelo:'VIRTUS COMFORTLINE 1.6 MSI 110CV',tipo:'SEDAN 4 PUERTAS',precios:{'2020':21034000,'2019':19982000,'2018':18983000}},
+{marca:'VOLKSWAGEN',modelo:'VIRTUS COMFORTLINE 1.6 MSI 110CV AT',tipo:'SEDAN 4 PUERTAS',precios:{'2022':25749000,'2021':24523000,'2020':23355000,'2019':22243000,'2018':21131000}},
+{marca:'VOLKSWAGEN',modelo:'VIRTUS COMFORTLINE AT 1.6 110CV',tipo:'SEDAN 4 PUERTAS',precios:{'2022':25749000,'2021':24523000,'2020':23355000,'2019':22243000,'2018':21131000}},
+{marca:'VOLKSWAGEN',modelo:'VIRTUS COMFORTLINE MSI MT G1',tipo:'SEDAN 4 PUERTAS',precios:{'0Km':43257750,'2025':37121575,'2024':30985400,'2023':29436200}},
+{marca:'VOLKSWAGEN',modelo:'VIRTUS EXCLUSIVE 250TSI AT G1',tipo:'SEDAN 4 PUERTAS',precios:{'0Km':53058450,'2025':45361075,'2024':37663700,'2023':35780500}},
+{marca:'VOLKSWAGEN',modelo:'VIRTUS GTS AT 1.4 TSI 150CV',tipo:'SEDAN 4 PUERTAS',precios:{'2023':32750000,'2022':31113000,'2021':29557000,'2020':28079000}},
+{marca:'VOLKSWAGEN',modelo:'VIRTUS HIGHLINE 1.6 MSI 110CV',tipo:'SEDAN 4 PUERTAS',precios:{'2020':22050000,'2019':21000000,'2018':19950000}},
+{marca:'VOLKSWAGEN',modelo:'VIRTUS HIGHLINE 1.6 MSI 110CV AT',tipo:'SEDAN 4 PUERTAS',precios:{'2023':29282000,'2022':27888000,'2021':26560000,'2020':25295000,'2019':24090000,'2018':22886000}},
+{marca:'VOLKSWAGEN',modelo:'VIRTUS HIGHLINE 170TSI AT G1',tipo:'SEDAN 4 PUERTAS',precios:{'0Km':47075650,'2025':40268825,'2024':33462000,'2023':31788800}},
+{marca:'VOLKSWAGEN',modelo:'VIRTUS HIGHLINE AT 1.6 110CV',tipo:'SEDAN 4 PUERTAS',precios:{'2023':29282000,'2022':27888000,'2021':26560000,'2020':25295000,'2019':24090000,'2018':22886000}},
+{marca:'VOLKSWAGEN',modelo:'VIRTUS MSI 1.6 110CV',tipo:'SEDAN 4 PUERTAS',precios:{'2023':25459200,'2022':24186200,'2021':22976900,'2020':21828000,'2019':20736700,'2018':19699900}},
+{marca:'VOLKSWAGEN',modelo:'VIRTUS MSI AT 1.6 110CV',tipo:'SEDAN 4 PUERTAS',precios:{'2022':25749000,'2021':24523000,'2020':23355000,'2019':22243000,'2018':21131000}},
+{marca:'VOLKSWAGEN',modelo:'VIRTUS MSI MT G1',tipo:'SEDAN 4 PUERTAS',precios:{'0Km':40165400,'2025':34467450,'2024':28769500,'2023':27331100}},
+{marca:'VOLKSWAGEN',modelo:'VIRTUS TRENDLINE 1.6 MSI 110CV',tipo:'SEDAN 4 PUERTAS',precios:{'2023':25459200,'2022':24186200,'2021':22976900,'2020':21828000,'2019':20736700,'2018':19699900}},
+{marca:'VOLKSWAGEN',modelo:'VIRTUS TRENDLINE 1.6 MSI 110CV AT',tipo:'SEDAN 4 PUERTAS',precios:{'2021':23337600,'2020':22170700,'2019':21062200,'2018':20009100}},
+{marca:'VOLKSWAGEN',modelo:'VIRTUS TRENDLINE 170TSI AT G1',tipo:'SEDAN 4 PUERTAS',precios:{'0Km':42395850,'2025':38156265}},
+
+];
+
+// ── PATENTES CABA (valuación fiscal 2026, fórmula bimestral) ──────────────
+const patentesData = {
+  'TOYOTA|||AVENSIS 1.6 TERRA':{'2007':38242},
+  'TOYOTA|||AVENSIS 2.0 A/T':{'2007':38242},
+  'TOYOTA|||AVENSIS 2.0 M/T':{'2007':38242},
+  'TOYOTA|||CAMRY HEV 2.5 ECVT':{'2025':221174,'2024':141355},
+  'TOYOTA|||CAMRY HV 2.5 ECVT':{'2025':221174,'2024':141355},
+  'TOYOTA|||C-HR HEV 1.8 ECVT':{'2025':221174,'2024':141355,'2023':134623,'2022':127892},
+  'TOYOTA|||C-HR HV 1.8 ECVT':{'2025':221174,'2024':141355,'2023':134623,'2022':127892},
+  'TOYOTA|||COROLLA 2.0 SEG CVT':{'2025':221174,'2024':141355,'2023':134623,'2022':127892,'2021':121498,'2020':115423,'2019':109652},
+  'TOYOTA|||COROLLA 2.0 XEI CVT':{'2025':185142,'2024':117985,'2023':112366,'2022':117724,'2021':111838,'2020':106246},
+  'TOYOTA|||COROLLA 2.0 XLI CVT':{'2025':138640,'2024':130116,'2023':123921,'2022':117724,'2021':111838,'2020':106246},
+  'TOYOTA|||COROLLA 2.0 XLI CVT PIO':{'2025':205671,'2024':134110,'2023':127724,'2022':121338,'2021':115271,'2020':109507},
+  'TOYOTA|||COROLLA 2.0 XLI MT':{'2023':120331,'2022':114314,'2021':108598,'2020':103168},
+  'TOYOTA|||COROLLA 2.0 XLI SAFETY CVT':{'2025':138640,'2024':130116,'2023':123921,'2022':117724,'2021':111838,'2020':106246},
+  'TOYOTA|||COROLLA CROSS SEG 2.0 CVT':{'2025':266662},
+  'TOYOTA|||COROLLA CROSS SEG HEV 1.8 ECVT':{'2025':266662},
+  'TOYOTA|||COROLLA CROSS SEG HEV SAFETY 1.8 ECVT':{'2025':266662},
+  'TOYOTA|||COROLLA CROSS SEG SAFETY 2.0 CVT':{'2025':266662},
+  'TOYOTA|||COROLLA CROSS XEI 2.0 CVT':{'2025':266662},
+  'TOYOTA|||COROLLA CROSS XEI HEV 1.8 ECVT':{'2025':266662},
+  'TOYOTA|||COROLLA HEV 1.8 SEG ECVT':{'2025':221174,'2024':141355,'2023':134623,'2022':127892,'2021':121498,'2020':115423,'2019':109652},
+  'TOYOTA|||COROLLA HEV 1.8 XEI ECVT':{'2025':185142,'2024':117985,'2023':112366},
+  'TOYOTA|||COROLLA HV 1.8 SEG ECVT':{'2025':221174,'2024':141355,'2023':134623,'2022':127892,'2021':121498,'2020':115423,'2019':109652},
+  'TOYOTA|||COROLLA HV 1.8 XEI ECVT':{'2025':185142,'2024':117985,'2023':112366,'2022':117724,'2021':111838,'2020':106246},
+  'TOYOTA|||COROLLA S 1.8 M/T':{'2017':99433,'2016':94461},
+  'TOYOTA|||COROLLA SE-G 1.8 6M/T':{'2020':112869,'2019':107226,'2018':101865},
+  'TOYOTA|||COROLLA SE-G 1.8 CVT':{'2020':115423,'2019':109652,'2018':100934,'2017':99433,'2016':94461},
+  'TOYOTA|||COROLLA SEG HEV 1.8 ECVT':{'2025':266662},
+  'TOYOTA|||COROLLA XEI 1.8 6M/T':{'2021':118810,'2020':112869,'2019':107226,'2018':101865},
+  'TOYOTA|||COROLLA XEI 1.8 CVT':{'2022':127892,'2021':121498,'2020':115423,'2019':109652,'2018':100934,'2017':99433},
+  'TOYOTA|||COROLLA XLI 1.8 6M/T':{'2021':118810,'2020':112869,'2019':107226,'2018':101865},
+  'TOYOTA|||COROLLA XLI 1.8 CVT':{'2021':121498,'2020':115423,'2019':109652,'2018':100934,'2017':99433,'2016':94461},
+  'TOYOTA|||ETIOS AIBO 1.5 6M/T':{'2024':126347,'2023':120331,'2022':114314},
+  'TOYOTA|||ETIOS CROSS 1.5 4A/T':{'2024':141355,'2023':134623,'2022':127892},
+  'TOYOTA|||ETIOS CROSS 1.5 6M/T':{'2024':126347,'2023':120331,'2022':114314},
+  'TOYOTA|||ETIOS CROSS 1.5 M/T':{'2024':141355,'2023':134623,'2022':127892,'2021':118810,'2020':112869},
+  'TOYOTA|||ETIOS PLATINUM 1.5 6M/T':{'2024':126347,'2023':120331,'2022':114314},
+  'TOYOTA|||ETIOS X 1.5 6M/T':{'2025':129600,'2024':126347,'2023':120331,'2022':114314,'2021':118810,'2020':112869,'2019':107226,'2018':101865,'2017':99433},
+  'TOYOTA|||ETIOS X 1.5 M/T':{'2023':134623,'2022':127892,'2021':118810,'2020':112869},
+  'TOYOTA|||ETIOS XLS 1.5 4A/T':{'2025':221174,'2024':141355,'2023':134623,'2022':127892,'2021':118810,'2020':112869,'2019':107226},
+  'TOYOTA|||ETIOS XLS 1.5 6M/T':{'2025':129600,'2024':126347,'2023':120331,'2022':114314,'2021':118810,'2020':112869,'2019':107226},
+  'TOYOTA|||ETIOS XLS 1.5 M/T':{'2023':134623,'2022':127892,'2021':118810,'2020':112869},
+  'TOYOTA|||ETIOS XLS PACK 1.5 6M/T':{'2025':129600,'2024':126347,'2023':120331,'2022':114314},
+  'TOYOTA|||ETIOS XS 1.5 6M/T':{'2024':126347,'2023':120331,'2022':114314},
+  'TOYOTA|||ETIOS XS 1.5 M/T':{'2023':134623,'2022':127892,'2021':118810},
+  'TOYOTA|||GR YARIS AT':{'2025':221174},
+  'TOYOTA|||GR YARIS MT':{'2025':129600},
+  'TOYOTA|||HIACE COMMUTER 2.8 TDI 6AT 14A':{'2025':570607,'2024':458097,'2023':435192},
+  'TOYOTA|||HIACE FURGON L2H2 2.8 TDI 6AT 3A':{'2025':570607,'2024':458097},
+  'TOYOTA|||HIACE L1H1 2.8 TDI 6AT 3A':{'2025':570607,'2024':458097,'2023':435192,'2022':413433},
+  'TOYOTA|||HIACE L2H2 2.8 TDI 6AT 3A':{'2025':570607,'2024':458097,'2023':435192,'2022':413433},
+  'TOYOTA|||HIACE WAGON 2.8 TDI 6AT 10A':{'2025':570607,'2024':458097,'2023':435192,'2022':413433},
+  'TOYOTA|||HILUX 4X2 D/C SR 2.4 TDI 6 M/T':{'2025':570607,'2024':458097,'2023':435192,'2022':413433},
+  'TOYOTA|||HILUX 4X2 D/C SRV 2.8 TDI 6 A/T':{'2025':570607,'2024':458097,'2023':435192,'2022':413433},
+  'TOYOTA|||HILUX 4X2 D/C SRV 2.8 TDI 6 M/T':{'2025':570607,'2024':458097,'2023':435192,'2022':413433},
+  'TOYOTA|||HILUX 4X2 D/C SRX 2.8 TDI 6 A/T':{'2025':570607,'2024':458097,'2023':435192,'2022':413433},
+  'TOYOTA|||HILUX 4X2 DC DX 2.4 TDI 6 MT':{'2025':570607,'2024':458097,'2023':435192,'2022':413433},
+  'TOYOTA|||HILUX 4X2 DC SR 2.4 TDI 6 MT':{'2025':570607,'2024':458097,'2023':435192,'2022':413433},
+  'TOYOTA|||HILUX 4X2 DC SRV 2.8 TDI 6 AT':{'2025':570607,'2024':458097,'2023':435192,'2022':413433},
+  'TOYOTA|||HILUX 4X2 DC SRX 2.8 TDI 6 AT':{'2025':570607,'2024':458097,'2023':435192,'2022':413433},
+  'TOYOTA|||HILUX 4X4 D/C DX 2.4 TDI 6 M/T':{'2025':570607,'2024':458097,'2023':435192,'2022':413433},
+  'TOYOTA|||HILUX 4X4 D/C GR-S 2.8 TDI 6 A/T':{'2025':570607,'2024':458097,'2023':435192},
+  'TOYOTA|||HILUX 4X4 D/C SR 2.8 TDI 6 M/T':{'2025':570607,'2024':458097,'2023':435192,'2022':413433},
+  'TOYOTA|||HILUX 4X4 D/C SRV 2.8 TDI 6 A/T':{'2025':570607,'2024':458097,'2023':435192,'2022':413433},
+  'TOYOTA|||HILUX 4X4 D/C SRX 2.8 TDI 6 A/T':{'2025':570607,'2024':458097,'2023':435192,'2022':413433},
+  'TOYOTA|||HILUX 4X4 DC DX 2.4 TDI 6 MT':{'2025':570607,'2024':458097,'2023':435192,'2022':413433},
+  'TOYOTA|||HILUX 4X4 DC SR 2.8 TDI 6 MT':{'2025':570607,'2024':458097,'2023':435192,'2022':413433},
+  'TOYOTA|||HILUX 4X4 DC SRV 2.8 TDI 6 AT':{'2025':570607,'2024':458097,'2023':435192,'2022':413433},
+  'TOYOTA|||HILUX 4X4 DC SRX 2.8 TDI 6 AT':{'2025':570607,'2024':458097,'2023':435192,'2022':413433},
+  'TOYOTA|||HILUX 4X4 DC GR-SPORT IV 2.8 TDI 6 AT':{'2025':570607,'2024':458097,'2023':435192},
+  'TOYOTA|||HILUX SW4 4X2 SR 3.0 TDI':{'2025':570607,'2024':458097,'2023':435192,'2022':413433},
+  'TOYOTA|||HILUX SW4 4X4 SRV 3.0 TDI':{'2025':570607,'2024':458097,'2023':435192,'2022':413433},
+  'TOYOTA|||HILUX SW4 4X4 SRV 3.0 TDI A/T':{'2022':413433},
+  'TOYOTA|||HILUX SW4 4X4 SRV 3.0 TDI A/T C/CUERO':{'2025':570607,'2024':458097,'2023':435192,'2022':413433},
+  'TOYOTA|||HILUX SW4 4X4 SRV 3.0 TDI C/CUERO':{'2025':570607,'2024':458097,'2023':435192,'2022':413433},
+  'TOYOTA|||INNOVA SR 2.7 NAFTA 6 A/T 8A':{'2024':458097,'2023':435192,'2022':413433},
+  'TOYOTA|||INNOVA SRV 2.7 NAFTA 6 A/T 8A':{'2024':458097,'2023':435192,'2022':413433},
+  'TOYOTA|||LAND CRUISER 300 GR-S':{'2025':641025},
+  'TOYOTA|||PRIUS 1.5 CVT':{'2025':221174,'2024':141355,'2023':134623,'2022':127892,'2021':121498,'2020':115423,'2019':109652,'2018':100934,'2017':99433,'2016':94461},
+  'TOYOTA|||PRIUS 1.8 CVT':{'2025':221174,'2024':141355,'2023':134623,'2022':127892,'2021':121498,'2020':115423,'2019':109652,'2018':100934,'2017':99433,'2016':94461},
+  'TOYOTA|||PRIUS HV 1.8 CVT':{'2025':221174,'2024':141355,'2023':134623,'2022':127892,'2021':121498,'2020':115423,'2019':109652,'2018':100934,'2017':99433,'2016':94461},
+  'TOYOTA|||RAV4 4X2 CVT':{'2025':185142,'2024':117985,'2023':112366},
+  'TOYOTA|||SW4 4X4 DIAMOND II 2.8 TDI 6 AT 7A':{'2025':570607,'2024':458097,'2023':435192,'2022':413433},
+  'TOYOTA|||SW4 4X4 GR-S 2.8 TDI 6 AT 7A':{'2025':570607,'2024':458097,'2023':435192,'2022':413433},
+  'TOYOTA|||SW4 4X4 SRX 2.8 TDI 6 A/T 7A':{'2025':570607,'2024':458097,'2023':435192,'2022':413433},
+  'TOYOTA|||SW4 4X4 SRX 2.8 TDI 6 AT 7A':{'2025':570607,'2024':458097,'2023':435192,'2022':413433},
+  'TOYOTA|||YARIS':{'2024':141355,'2023':134623,'2022':127892},
+  'TOYOTA|||YARIS GLE SPORT':{'2025':221174,'2024':141355,'2023':134623,'2022':127892,'2021':108598,'2020':112869,'2019':107226,'2018':101865},
+  'TOYOTA|||YARIS S 1.5 6M/T':{'2024':126347,'2023':120331,'2022':114314,'2021':118810},
+  'TOYOTA|||YARIS S 1.5 CVT':{'2025':221174,'2024':141355,'2023':134623,'2022':127892,'2021':121498,'2020':115423,'2019':109652,'2018':100934},
+  'TOYOTA|||YARIS XLI 1.5':{'2025':221174,'2024':141355,'2023':134623,'2022':127892,'2021':118810,'2020':112869,'2019':107226,'2018':101865},
+  'TOYOTA|||YARIS XLS 1.5 6M/T':{'2025':129600,'2024':126347,'2023':120331,'2022':114314,'2021':118810,'2020':112869,'2019':107226,'2018':101865},
+  'TOYOTA|||YARIS XLS 1.5 CVT':{'2025':221174,'2024':141355,'2023':134623,'2022':127892,'2021':121498,'2020':115423},
+  'TOYOTA|||YARIS XLS PACK 1.5 CVT':{'2025':221174,'2024':141355,'2023':134623,'2022':127892,'2021':121498,'2020':115423,'2019':109652,'2018':100934},
+  'TOYOTA|||YARIS XLS+ 1.5 CVT 5P':{'2025':205671,'2024':141355,'2023':134623,'2022':127892,'2021':121498,'2020':115423,'2019':109652,'2018':100934},
+  'TOYOTA|||YARIS XS 1.5 6M/T':{'2025':129600,'2024':126347,'2023':120331,'2022':114314,'2021':118810,'2020':112869,'2019':107226,'2018':101865},
+  'TOYOTA|||YARIS XS 1.5 CVT':{'2025':221174,'2024':141355,'2023':134623},
+  'TOYOTA|||86 GT A/T':{'2025':570607,'2024':458097,'2023':435192,'2022':413433},
+  'NISSAN|||ALTIMA ADVANCE MEDIA-TECH PURE DRIVE':{'2016':62415,'2015':59293},
+  'NISSAN|||ALTIMA ADVANCE PURE DRIVE':{'2016':62415,'2015':59293},
+  'NISSAN|||FRONTIER 4X2 SE 2.8TD':{'2012':105853},
+  'NISSAN|||FRONTIER 4X2 XE 2.8TD':{'2012':105853},
+  'NISSAN|||FRONTIER 4X4 XE 2.8TD':{'2012':105853},
+  'NISSAN|||FRONTIER 4X4 SE 2.8TD':{'2012':105853},
+  'NISSAN|||KICKS 1.6 ADVANCE CVT':{'2025':255831,'2024':177620,'2023':168739,'2022':138639,'2021':131708},
+  'NISSAN|||KICKS 1.6 ADVANCE CVT PLUS':{'2025':255831,'2024':177620,'2023':168739,'2022':138639,'2021':131708},
+  'NISSAN|||KICKS 1.6 ADVANCE MT':{'2023':168739,'2022':138639,'2021':131708},
+  'NISSAN|||KICKS 1.6 EXCLUSIVE CVT':{'2025':265916,'2024':182794,'2023':173655,'2022':142678,'2021':135545},
+  'NISSAN|||KICKS 1.6 EXCLUSIVE CVT BT':{'2024':182794,'2023':173655},
+  'NISSAN|||KICKS 1.6 SENSE MT':{'2025':260802,'2024':181071,'2023':130125,'2022':123619,'2021':117438},
+  'NISSAN|||KICKS ADVANCE CVT':{'2021':131708,'2020':125122,'2019':93182,'2018':69160,'2017':65700},
+  'NISSAN|||KICKS ADVANCE CVT UCL':{'2022':138639,'2021':131708,'2020':125122,'2019':93182},
+  'NISSAN|||KICKS ADVANCE MT':{'2021':131708,'2020':125122,'2019':69182,'2018':65722,'2017':62438},
+  'NISSAN|||KICKS EXCLUSIVE CVT':{'2021':135545,'2020':287830,'2019':266243,'2018':222414,'2017':67331},
+  'NISSAN|||KICKS EXCLUSIVE CVT BT':{'2022':142678,'2021':135545,'2020':287830,'2019':266243},
+  'NISSAN|||KICKS PLAY 1.6 ADVANCE CVT':{'2025':255831,'2024':177620,'2023':168739,'2022':138639,'2021':131708},
+  'NISSAN|||KICKS PLAY 1.6 ADVANCE CVT PLUS':{'2025':255831,'2024':177620,'2023':168739,'2022':138639,'2021':131708},
+  'NISSAN|||KICKS PLAY 1.6 EXCLUSIVE CVT':{'2025':265916,'2024':182794,'2023':173655,'2022':142678,'2021':135545},
+  'NISSAN|||KICKS PLAY 1.6 SENSE MT':{'2025':260802,'2024':181071,'2023':130125,'2022':123619,'2021':117438},
+  'NISSAN|||KICKS SENSE MT':{'2021':117438,'2020':111566,'2019':65565,'2018':62286},
+  'NISSAN|||MARCH ACENTA':{'2015':62016,'2014':49978},
+  'NISSAN|||MARCH ACTIVE MT':{'2016':62415,'2014':47593},
+  'NISSAN|||MARCH ADVANCE AT':{'2021':131708,'2020':125122,'2019':93182},
+  'NISSAN|||MARCH ADVANCE MEDIA-TECH AT PURE DRIVE':{'2020':98093,'2019':93182,'2018':69160,'2017':65700,'2016':62415},
+  'NISSAN|||MARCH ADVANCE MEDIA-TECH PURE DRIVE':{'2016':62415,'2015':59293,'2014':56329},
+  'NISSAN|||MARCH ADVANCE MT':{'2021':131708,'2020':125122,'2019':69182,'2018':65722,'2017':62438,'2016':59316,'2015':56351,'2014':53528},
+  'NISSAN|||MARCH SENSE AT':{'2021':117438,'2020':111566,'2019':69182},
+  'NISSAN|||MARCH SENSE MT':{'2021':117438,'2020':111566,'2019':65565,'2018':62286,'2017':59170,'2016':56216,'2015':53404},
+  'NISSAN|||MARCH VISIA':{'2013':42952,'2012':33656},
+  'NISSAN|||MARCH VISIA PLUS':{'2013':42952,'2012':33656},
+  'NISSAN|||MURANO EXCLUSIVE CVT':{'2025':265916,'2024':182794,'2023':173655},
+  'NISSAN|||NAVARA 2.5 TDI':{'2009':53302},
+  'NISSAN|||NAVARA 2.5 TDI 4X4':{'2009':67500},
+  'NISSAN|||NOTE ADVANCE CVT':{'2021':131708,'2020':125122,'2019':93182},
+  'NISSAN|||NOTE ADVANCE PURE DRIVE':{'2018':69160,'2017':65700,'2016':62415,'2015':59293,'2014':56329},
+  'NISSAN|||NOTE EXCLUSIVE CVT PURE DRIVE':{'2020':100519,'2019':95501,'2018':70881,'2017':67331,'2016':63968,'2015':60767},
+  'NISSAN|||NOTE SENSE CVT':{'2021':117438,'2020':111566},
+  'NISSAN|||NOTE SENSE PURE DRIVE':{'2019':69182,'2018':65722,'2017':59170,'2016':56216,'2015':53404,'2014':50732},
+  'NISSAN|||PRIMERA SLX 2.0 TD':{'2002':47138},
+  'NISSAN|||SENTRA 1.8 S':{'2015':59062},
+  'NISSAN|||SENTRA 2.0 ADVANCE CVT':{'2025':255831,'2024':177620,'2023':168739,'2022':138639,'2021':131708,'2020':125122},
+  'NISSAN|||SENTRA 2.0 ADVANCE MT':{'2023':168739,'2022':138639,'2021':131708,'2020':125122},
+  'NISSAN|||SENTRA 2.0 EXCLUSIVE CVT':{'2025':265916,'2024':182794,'2023':173655,'2022':142678,'2021':135545,'2020':287830},
+  'NISSAN|||SENTRA 2.0 SR CVT':{'2025':260802,'2024':181071,'2020':287830},
+  'NISSAN|||SENTRA ACENTA 6MT':{'2016':62415,'2015':62016,'2014':47593,'2013':45220},
+  'NISSAN|||SENTRA ACENTA XTRONIC CVT':{'2016':62415,'2014':49978,'2013':47475},
+  'NISSAN|||SENTRA ADVANCE MT':{'2022':138639,'2021':131708},
+  'NISSAN|||SENTRA ADVANCE PURE DRIVE':{'2019':93182,'2018':69160,'2017':65700,'2016':62415,'2015':59293,'2014':56329},
+  'NISSAN|||SENTRA EXCLUSIVE CVT':{'2022':142678,'2021':135545},
+  'NISSAN|||SENTRA EXCLUSIVE CVT PURE DRIVE':{'2019':95501,'2018':70881,'2017':67331,'2016':63968,'2015':60767,'2014':57730},
+  'NISSAN|||SENTRA SENSE PURE DRIVE':{'2019':69182,'2018':65722,'2017':59170,'2016':56216},
+  'NISSAN|||SENTRA SR CVT':{'2022':123619,'2021':117438},
+  'NISSAN|||SENTRA SR CVT PURE DRIVE':{'2019':69182,'2018':65722,'2017':59170,'2016':56216,'2015':53404,'2014':50732},
+  'NISSAN|||SENTRA SV PURE DRIVE':{'2016':56216,'2015':53404,'2014':50732},
+  'NISSAN|||TEANA 250 XV V6':{'2009':53302},
+  'NISSAN|||TERRANO II 2.7 TD':{'2007':60919,'2006':57876,'2005':54979,'2004':52228},
+  'NISSAN|||TERRANO II SE 2.4':{'2003':49618},
+  'NISSAN|||TERRANO II SE 2.7 TDI':{'2003':49618},
+  'NISSAN|||TIIDA 1.8 6MT ACENTA':{'2013':53640,'2012':49882,'2011':46390,'2010':43144,'2009':55969,'2008':53173},
+  'NISSAN|||TIIDA 1.8 6MT TEKNA':{'2013':53640,'2012':49882,'2011':46390,'2010':43144,'2009':58770,'2008':55828},
+  'NISSAN|||TIIDA 1.8 6MT VISIA':{'2010':43144,'2009':53302,'2008':50636},
+  'NISSAN|||TITAN V8 5.6':{'2004':269267},
+  'NISSAN|||VERSA':{'2013':42952,'2012':33656,'2011':43841},
+  'NISSAN|||VERSA 1.6 ADVANCE CVT':{'2025':255831,'2024':177620,'2023':168739,'2022':138639,'2021':131708,'2020':125122},
+  'NISSAN|||VERSA 1.6 ADVANCE MT':{'2025':255831,'2024':177620,'2023':168739,'2022':138639,'2021':131708,'2020':125122},
+  'NISSAN|||VERSA 1.6 EXCLUSIVE CVT':{'2025':265916,'2024':182794,'2023':130125,'2022':123619,'2021':117438,'2020':111566},
+  'NISSAN|||VERSA 1.6 SENSE CVT':{'2023':130125,'2022':123619,'2021':117438,'2020':111566},
+  'NISSAN|||VERSA 1.6 SENSE MT':{'2025':260802,'2024':181071,'2023':130125,'2022':123619,'2021':117438,'2020':111566},
+  'NISSAN|||VERSA 1.6 SR CVT':{'2025':260802,'2024':181071},
+  'NISSAN|||VERSA ACENTA':{'2014':49978,'2013':47475},
+  'NISSAN|||VERSA ACENTA A/T':{'2014':49978,'2013':47475},
+  'NISSAN|||VERSA ADVANCE AT':{'2018':69160,'2017':65700,'2016':62415,'2015':59293,'2014':49978,'2013':47475,'2012':33656},
+  'NISSAN|||VERSA ADVANCE MT':{'2018':65722,'2017':62438,'2016':62415,'2015':56351,'2014':47593,'2013':45220,'2012':33656},
+  'NISSAN|||VERSA EXCLUSIVE AT':{'2018':70881,'2017':67331,'2016':63968,'2015':60767,'2014':57730,'2013':42952,'2012':33656},
+  'NISSAN|||VERSA S':{'2013':42952,'2012':33656,'2011':43841},
+  'NISSAN|||VERSA SENSE AT':{'2021':117438,'2020':111566,'2019':69182},
+  'NISSAN|||VERSA SENSE MT':{'2021':117438,'2020':111566,'2019':65565,'2018':62286,'2017':59170,'2016':62415,'2015':53404},
+  'NISSAN|||VERSA V-DRIVE MT':{'2023':141684,'2022':134599,'2021':92758},
+  'NISSAN|||VERSA V-DRIVE PLUS AT':{'2023':141684,'2022':134599,'2021':127869},
+  'NISSAN|||VERSA VISIA':{'2013':42952,'2012':33656},
+  'NISSAN|||X-TRAIL':{'2012':94219,'2011':65115,'2010':61858,'2009':58770},
+  'NISSAN|||X-TRAIL 2.2 DIESEL':{'2012':94219},
+  'NISSAN|||X-TRAIL 2.5 6MT':{'2012':94219,'2011':65115,'2010':61858,'2009':58770},
+  'NISSAN|||X-TRAIL 2.5 6MT ACENTA':{'2018':222414},
+  'NISSAN|||X-TRAIL 2.5 CVT':{'2018':222414},
+  'NISSAN|||X-TRAIL 2.5 CVT ACENTA':{'2018':222414},
+  'NISSAN|||X-TRAIL 2.5 CVT TEKNA':{'2018':222414},
+  'NISSAN|||X-TRAIL 2.5 CVT VISIA':{'2019':266243},
+  'NISSAN|||X-TRAIL 2.5 EXCLUSIVE CVT':{'2025':477684,'2024':182794,'2023':366984},
+  'NISSAN|||X-TRAIL ACENTA 2.0 DCI 6MT':{'2022':429020,'2021':403106,'2020':287830,'2019':266243},
+  'NISSAN|||X-TRAIL ACENTA 2.5 6MT':{'2022':429020,'2021':403106,'2020':287830,'2019':266243},
+  'NISSAN|||X-TRAIL ADVANCE CVT':{'2025':477684},
+  'NISSAN|||X-TRAIL EPOWER EXCLUSIVE CVT':{'2025':265916,'2024':182794,'2023':366984},
+  'NISSAN|||X-TRAIL EXCLUSIVE CVT':{'2024':182794,'2023':366984,'2022':429020,'2021':403106,'2020':287830,'2019':266243},
+  'NISSAN|||X-TRAIL TEKNA XTRONIC CVT':{'2020':287830,'2019':266243},
+  'FIAT|||500X CROSS 1.4 16V AT9':{'2020':68510,'2019':61659},
+  'FIAT|||ARGO DRIVE 1.3':{'2020':68510,'2019':61659,'2018':58233},
+  'FIAT|||ARGO PRECISION 1.8':{'2023':139743,'2022':132756,'2021':126118,'2020':119812,'2019':113821},
+  'FIAT|||ARGO PRECISION 1.8 AT6':{'2023':139743,'2022':132756,'2021':126118,'2020':119812,'2019':113821},
+  'FIAT|||CRONOS 1.3 GSE BZ':{'2024':122715,'2023':116579,'2022':110750,'2021':92077,'2020':105749},
+  'FIAT|||CRONOS DRIVE 1.3 GSE BZ':{'2025':210283,'2024':129159,'2023':105231,'2022':96462},
+  'FIAT|||CRONOS DRIVE 1.3 GSE CVT BZ':{'2025':139124,'2024':122715,'2023':116579,'2022':110750},
+  'FIAT|||CRONOS DRIVE 1.3 MT':{'2024':129159,'2023':105231,'2022':96462,'2021':92077,'2020':68510,'2019':61659},
+  'FIAT|||CRONOS LIKE 1.3 GSE BZ':{'2025':139124,'2024':122715,'2023':116579},
+  'FIAT|||CRONOS PRECISION 1.3 GSE CVT BZ':{'2025':139124,'2024':122715,'2023':116579,'2022':110750},
+  'FIAT|||CRONOS PRECISION 1.8 AT':{'2024':130809,'2023':139743,'2022':132756,'2021':126118,'2020':119812,'2019':113821},
+  'FIAT|||CRONOS PRECISION 1.8 MT':{'2024':130809,'2023':139743,'2022':132756,'2021':126118,'2020':119812,'2019':113821},
+  'FIAT|||CRONOS STILE 1.3 GSE BZ':{'2024':122715,'2023':116579,'2022':110750,'2021':92077},
+  'FIAT|||STRADA VOLCANO 1.3 CD':{'2020':68510},
+  'FIAT|||STRADA VOLCANO 1.3 CVT':{'2025':139124,'2024':122715,'2023':116579,'2022':110750},
+  'FIAT|||WEEKEND ATTRACTIVE 1.4 8V':{'2021':92077},
+  'RENAULT|||ALASKAN INTENS 4X2 MT':{'2025':198320,'2024':125274,'2023':103197,'2022':100191,'2021':100094,'2020':99997},
+  'RENAULT|||ALASKAN INTENS 4X2 AT':{'2025':198320,'2024':125274,'2023':103197},
+  'RENAULT|||ALASKAN INTENS 4X4 MT':{'2025':198320,'2024':125274,'2023':103197,'2022':100191,'2021':100094,'2020':99997},
+  'RENAULT|||ALASKAN INTENS 4X4 AT':{'2025':198320,'2024':125274,'2023':103197},
+  'RENAULT|||ALASKAN INTENS NOIR 4X4 MT':{'2025':198320,'2024':125274,'2023':103197,'2022':100191,'2021':100094,'2020':99997},
+  'RENAULT|||ALASKAN INTENS NOIR 4X4 AT':{'2025':198320,'2024':125274,'2023':103197},
+  'RENAULT|||ALASKAN OUTSIDER 4X4 MT':{'2024':125274,'2023':103197},
+  'RENAULT|||CAPTUR INTENS 1.6 CVT':{'2024':125274,'2023':103197,'2022':100191,'2021':100094,'2020':99997},
+  'RENAULT|||CAPTUR INTENS 2.0':{'2024':125274,'2023':103197,'2022':100191,'2021':100094,'2020':99997,'2019':105955},
+  'RENAULT|||CAPTUR BOSE 1.6 CVT':{'2024':128543,'2023':109451,'2022':100746,'2021':95948},
+  'RENAULT|||DUSTER CONFORT 1.6 4X2':{'2015':48655},
+  'RENAULT|||DUSTER ICONIC 1.3T 4X2 CVT':{'2025':203562,'2024':128543,'2023':109451,'2022':106263,'2021':106161},
+  'RENAULT|||DUSTER INTENS 1.6 CVT':{'2024':125274,'2023':103197,'2022':100191,'2021':100094},
+  'RENAULT|||DUSTER INTENS 1.6 MT':{'2025':198320,'2024':125274,'2023':103197,'2022':100191,'2021':100094},
+  'RENAULT|||DUSTER OUTSIDER 1.3T CVT':{'2024':128543,'2023':109451,'2022':106263},
+  'RENAULT|||DUSTER PH2 DYNAMIQUE 1.6':{'2024':131140,'2023':125033,'2022':113588,'2021':102230,'2020':92007,'2019':65378,'2018':61208},
+  'RENAULT|||DUSTER PH2 EXPRESSION 2.0 4X4':{'2020':64517,'2019':60121,'2018':56286},
+  'RENAULT|||DUSTER PH2 PRIVILEGE 1.6':{'2024':125274,'2023':103197,'2022':113588,'2021':100094,'2020':92007,'2019':58505,'2018':55580},
+  'RENAULT|||DUSTER PH2 PRIVILEGE 2.0 4X4':{'2019':58505,'2018':55580},
+  'RENAULT|||DUSTER OROCH DYNAMIQUE 1.6':{'2019':65378,'2018':61208,'2017':57305},
+  'RENAULT|||DUSTER OROCH DYNAMIQUE 2.0':{'2019':65378,'2018':61208,'2017':57305},
+  'RENAULT|||DUSTER OROCH DYNAMIQUE 2.0 4X4':{'2019':65378},
+  'RENAULT|||DUSTER OROCH PRIVILEGE 2.0':{'2019':57832,'2018':54941,'2017':52194},
+  'RENAULT|||OROCH ICONIC 1.3 TCE 2WD CVT':{'2025':203562,'2024':128543,'2023':109451,'2022':106263},
+  'RENAULT|||FLUENCE 2.0 16V DYNAMIQUE':{'2019':65378,'2018':61208,'2017':57305,'2016':54173,'2015':51217},
+  'RENAULT|||FLUENCE 2.0 16V PRIVILEGE':{'2019':57832,'2018':54941,'2017':52194,'2016':49584,'2015':47105,'2013':48413},
+  'RENAULT|||FLUENCE PH2 2.0 PRIVILEGE':{'2019':57832,'2018':54941,'2017':52194,'2016':49584,'2015':47105,'2013':48413},
+  'RENAULT|||KANGOO II STEPWAY 1.5 DCI':{'2025':188268,'2024':131140,'2023':125033,'2022':113588,'2021':102230,'2020':92007,'2019':64692,'2018':61208},
+  'RENAULT|||KANGOO II STEPWAY 1.6 SCE':{'2025':188268,'2024':131140,'2023':125033,'2022':113588,'2021':102230,'2020':92007,'2019':64692,'2018':54941},
+  'RENAULT|||KANGOO II ZEN 1.6 SCE':{'2025':203562,'2024':128543,'2023':109451,'2022':106263,'2021':106161,'2020':54505,'2019':58505,'2018':55580},
+  'RENAULT|||KANGOO EXPRESS 2A 1.5 DCI':{'2020':54505,'2019':51780,'2018':49191},
+  'RENAULT|||KANGOO EXPRESS 2A 1.6 SCE':{'2025':203562,'2024':128543,'2023':109451,'2022':106263,'2021':106161,'2020':54505,'2019':58505,'2018':55580},
+  'RENAULT|||KANGOO EXPRESS 5A 1.5 DCI':{'2020':54505,'2019':51780,'2018':49191},
+  'RENAULT|||KANGOO EXPRESS 5A 1.6 SCE':{'2025':203562,'2024':128543,'2023':109451,'2022':106263,'2021':106161,'2020':54505,'2019':58505,'2018':55580},
+  'RENAULT|||KOLEOS INTENS 2.5 4WD CVT':{'2025':198320,'2024':125274,'2023':103197,'2022':100191,'2021':100094,'2020':99997,'2019':105955},
+  'RENAULT|||KOLEOS PH2 INTENS 2.5 4WD CVT':{'2025':198320,'2024':125274,'2023':103197,'2022':100191,'2021':100094,'2020':99997,'2019':105955,'2018':55580},
+  'RENAULT|||KWID INTENS 1.0':{'2025':198320,'2024':125274,'2023':103197,'2022':100191,'2021':100094,'2020':99997},
+  'RENAULT|||LOGAN INTENS 1.6':{'2025':198320,'2024':125274},
+  'RENAULT|||LOGAN PH2 INTENS 1.6':{'2025':198320,'2024':125274,'2023':103197,'2022':100191,'2021':100094,'2020':99997,'2019':105955,'2018':55580},
+  'RENAULT|||LOGAN PH2 INTENS 1.6 CVT':{'2024':125274,'2023':103197,'2022':100191,'2021':100094},
+  'RENAULT|||LOGAN PH2 LIFE 1.6':{'2025':184013,'2024':118877,'2023':95379,'2022':92601,'2021':92511,'2020':92421,'2019':92332,'2018':55580},
+  'RENAULT|||LOGAN PH2 ZEN 1.6':{'2025':198320,'2024':125274,'2023':103197,'2022':113588,'2021':100094,'2020':92007,'2019':64692,'2018':55580},
+  'RENAULT|||MEGANE III 2.0 16V LUXE':{'2019':51780,'2018':45518,'2017':43242,'2016':44395},
+  'RENAULT|||MEGANE III 2.0 16V PRIVILEGE':{'2019':57832,'2018':54941,'2017':52194,'2016':49584},
+  'RENAULT|||MEGANE III RS 265 CV':{'2019':58505},
+  'RENAULT|||SANDERO INTENS 1.6':{'2025':198320,'2024':125274,'2023':103197,'2022':100191},
+  'RENAULT|||SANDERO INTENS 1.6 CVT':{'2025':198320,'2024':125274,'2023':103197,'2022':100191},
+  'RENAULT|||SANDERO LIFE 1.6':{'2025':184013,'2024':118877,'2023':95379,'2022':92601},
+  'RENAULT|||SANDERO ZEN 1.6':{'2025':198320,'2024':125274,'2023':103197,'2022':106263},
+  'RENAULT|||SANDERO PH2 INTENS 1.6':{'2025':198320,'2024':125274,'2023':103197,'2022':100191,'2021':100094,'2020':99997,'2019':105955,'2018':55580},
+  'RENAULT|||SANDERO PH2 INTENS 1.6 CVT':{'2025':198320,'2024':125274,'2023':103197,'2022':100191,'2021':100094,'2020':99997,'2019':105955,'2018':55580},
+  'RENAULT|||SANDERO PH2 LIFE 1.6':{'2025':184013,'2024':118877,'2023':95379,'2022':92601,'2021':92511,'2020':92421,'2019':92332,'2018':55580},
+  'RENAULT|||SANDERO PH2 GT LINE 1.6':{'2024':125274,'2023':103197,'2022':100746,'2021':95948},
+  'RENAULT|||SANDERO PH2 RS 2.0':{'2024':125274,'2023':103197,'2022':100191,'2021':100094},
+  'RENAULT|||SANDERO PH2 ZEN 1.6':{'2025':198320,'2024':125274,'2023':103197,'2022':100191,'2021':100094,'2020':99997},
+  'RENAULT|||SANDERO PH2 STEPWAY INTENS 1.6':{'2025':188268,'2024':131140,'2023':125033,'2022':113588,'2021':102230,'2020':92007,'2019':64692,'2018':61208},
+  'RENAULT|||SANDERO PH2 STEPWAY INTENS 1.6 CVT':{'2025':188268,'2024':131140,'2023':125033,'2022':113588,'2021':102230,'2020':92007,'2019':64692,'2018':55580},
+  'RENAULT|||SANDERO PH2 STEPWAY ZEN 1.6':{'2024':131140,'2023':125033,'2022':113588,'2021':102230,'2020':92007},
+  'RENAULT|||STEPWAY INTENS 1.6':{'2025':188268,'2024':131140,'2023':125033,'2022':113588,'2021':102230,'2020':92007,'2019':64692},
+  'RENAULT|||STEPWAY INTENS 1.6 CVT':{'2025':188268,'2024':131140,'2023':125033,'2022':113588,'2021':102230,'2020':99997,'2019':105955},
+  'RENAULT|||STEPWAY ZEN 1.6':{'2025':188268,'2024':131140,'2023':125033,'2022':113588},
+  'VOLKSWAGEN|||POLO CLASSIC 1.9 TDI':{'2002':10293},
+  'VOLKSWAGEN|||POLO CLASSIC 1.9 TDI 99A':{'2002':10293},
+  'VOLKSWAGEN|||POLO CLASSIC 1.9 TDI 99B':{'2004':11405,'2003':10835,'2002':10293},
+  'VOLKSWAGEN|||POLO CLASSIC 1.9L SD 30':{'2004':11405,'2003':10835,'2002':10293},
+  'VOLKSWAGEN|||POLO CLASSIC 1.9L SD 31A':{'2004':11405,'2003':10835,'2002':10293},
+  'VOLKSWAGEN|||POLO CLASSIC 1.9L SD 31B':{'2010':17692,'2009':17060,'2008':16428,'2007':15796,'2006':15165,'2005':14406,'2004':11405,'2003':10835,'2002':10293},
+  'VOLKSWAGEN|||POLO CLASSIC 1.9L SD 3A':{'2004':11405,'2003':10835,'2002':10293},
+  'VOLKSWAGEN|||POLO CLASSIC SD':{'2002':10293},
+  'VOLKSWAGEN|||POLO CLASSIC SD 97D':{'2002':10293},
+  'VOLKSWAGEN|||POLO CLASSIC SD 981':{'2004':11405,'2003':10835,'2002':10293},
+  'VOLKSWAGEN|||POLO CLASSIC SD 98C':{'2004':11405,'2003':10835,'2002':10293},
+  'VOLKSWAGEN|||POLO CLASSIC SD 98D':{'2004':11405,'2003':10835,'2002':10293},
+  'VOLKSWAGEN|||POLO COMFORTLINE 1.6 MSI 110CV':{'2021':128111,'2020':121706,'2019':115621,'2018':109839,'2017':104348},
+  'VOLKSWAGEN|||POLO COMFORTLINE 170TSI AT G1':{'2025':319330},
+  'VOLKSWAGEN|||POLO COMFORTLINE PLUS 1.6 MSI 110CV AT':{'2021':128111,'2020':121706,'2019':115621,'2018':109839},
+  'VOLKSWAGEN|||POLO GTS AT 1.4 TSI 150CV':{'2023':135342,'2022':192650,'2021':183018,'2020':173867},
+  'VOLKSWAGEN|||POLO HIGHLINE 1.6 MSI 110CV':{'2019':129835,'2018':123343},
+  'VOLKSWAGEN|||POLO HIGHLINE 1.6 MSI 110CV AT':{'2023':184309,'2022':175094,'2021':166340,'2020':136668,'2019':129835,'2018':123343},
+  'VOLKSWAGEN|||POLO HIGHLINE 170TSI AT G1':{'2025':319330,'2024':224264,'2023':184309},
+  'VOLKSWAGEN|||POLO HIGHLINE AT 1.6 110CV':{'2023':184309,'2022':175094,'2021':166340,'2020':136668,'2019':129835,'2018':123343},
+  'VOLKSWAGEN|||POLO MSI AT':{'2023':184309,'2022':175094,'2021':166340,'2020':136668},
+  'VOLKSWAGEN|||POLO MSI MT':{'2023':184309,'2022':175094,'2021':166340,'2020':136668},
+  'VOLKSWAGEN|||POLO SDI BERLINE':{'2005':12005,'2004':11405,'2003':10835,'2002':10293},
+  'VOLKSWAGEN|||POLO SERVO':{'2005':12005,'2004':11405,'2003':10835,'2002':10293},
+  'VOLKSWAGEN|||POLO TRACK MSI MT G1':{'2023':135342},
+  'VOLKSWAGEN|||POLO TREND MSI MT':{'2023':135342,'2022':115539},
+  'VOLKSWAGEN|||POLO TRENDLINE 1.6 MSI 110CV':{'2021':117436,'2020':111564,'2019':105986,'2018':100686,'2017':104348},
+  'VOLKSWAGEN|||POLO TRENDLINE 1.6 MSI 110CV AT':{'2021':117436,'2020':111564,'2019':105986,'2018':100686},
+  'VOLKSWAGEN|||VIRTUS COMFORTLINE 1.6 MSI 110CV':{'2020':126532,'2019':120507,'2018':114482},
+  'VOLKSWAGEN|||VIRTUS COMFORTLINE 1.6 MSI 110CV AT':{'2022':139502,'2021':132859,'2020':126532,'2019':120507,'2018':114482},
+  'VOLKSWAGEN|||VIRTUS COMFORTLINE AT 1.6 110CV':{'2022':139502,'2021':132859,'2020':126532,'2019':120507,'2018':114482},
+  'VOLKSWAGEN|||VIRTUS COMFORTLINE MSI MT G1':{'2025':279594,'2024':216413,'2023':195289},
+  'VOLKSWAGEN|||VIRTUS EXCLUSIVE 250TSI AT G1':{'2025':359913,'2024':255485,'2023':220646},
+  'VOLKSWAGEN|||VIRTUS GTS AT 1.4 TSI 150CV':{'2023':195289,'2022':192650,'2021':183018,'2020':173867},
+  'VOLKSWAGEN|||VIRTUS HIGHLINE 1.6 MSI 110CV':{'2020':126532,'2019':120507,'2018':114482},
+  'VOLKSWAGEN|||VIRTUS HIGHLINE 1.6 MSI 110CV AT':{'2023':195289,'2022':139502,'2021':132859,'2020':126532,'2019':120507,'2018':114482},
+  'VOLKSWAGEN|||VIRTUS HIGHLINE 170TSI AT G1':{'2025':319330,'2024':206349,'2023':196031},
+  'VOLKSWAGEN|||VIRTUS HIGHLINE AT 1.6 110CV':{'2023':182881,'2022':174173,'2021':165879,'2020':136631,'2019':130125,'2018':123619},
+  'VOLKSWAGEN|||VIRTUS MSI 1.6 110CV':{'2023':195289,'2022':139502,'2021':132859,'2020':126532,'2019':120507,'2018':114482},
+  'VOLKSWAGEN|||VIRTUS MSI AT 1.6 110CV':{'2022':139502,'2021':132859,'2020':126532,'2019':120507,'2018':114482},
+  'VOLKSWAGEN|||VIRTUS MSI MT G1':{'2025':179502,'2024':216413,'2023':118719},
+  'VOLKSWAGEN|||VIRTUS TRENDLINE 1.6 MSI 110CV':{'2023':195289,'2022':139502,'2021':132859,'2020':126532,'2019':120507,'2018':114482},
+  'VOLKSWAGEN|||VIRTUS TRENDLINE 1.6 MSI 110CV AT':{'2021':132859,'2020':126532,'2019':120507,'2018':114482},
+  'VOLKSWAGEN|||VIRTUS TRENDLINE 170TSI AT G1':{'2025':319330}
+};
+function getPatente(marca, modelo, anio) {
+  const key = marca + '|||' + modelo;
+  if (patentesData[key] && patentesData[key][String(anio)] !== undefined) {
+    return patentesData[key][String(anio)];
+  }
+  return null;
+}
+
+
+const marcas = [...new Set(DATA.map(d => d.marca))].sort();
+const getModelos = (m) => [...new Set(DATA.filter(d => d.marca === m).map(d => d.modelo))].sort();
+const getTipos = (m, mod) => [...new Set(DATA.filter(d => d.marca === m && d.modelo === mod).map(d => d.tipo))].sort();
+const getAnios = () => {
+  const all = new Set();
+  DATA.forEach(d => Object.keys(d.precios).forEach(k => all.add(k)));
+  return ['0Km', ...Array.from(all).filter(k => k !== '0Km').map(Number).sort((a,b) => b-a).map(String)];
+};
+
+// Init selects
+const selMarca = document.getElementById('sel-marca');
+const selModelo = document.getElementById('sel-modelo');
+const selTipo = document.getElementById('sel-tipo');
+const selAnio = document.getElementById('sel-anio');
+
+marcas.forEach(m => {
+  const o = document.createElement('option');
+  o.value = m; o.textContent = m;
+  selMarca.appendChild(o);
+});
+
+getAnios().forEach(a => {
+  const o = document.createElement('option');
+  o.value = a; o.textContent = a === '0Km' ? '0 Km (nuevo)' : a;
+  selAnio.appendChild(o);
+});
+
+function updateModelos() {
+  const m = selMarca.value;
+  selModelo.innerHTML = '<option value="">— Seleccionar —</option>';
+  selTipo.innerHTML = '<option value="">— Seleccionar —</option>';
+  selModelo.disabled = !m;
+  selTipo.disabled = true;
+  if (m) {
+    getModelos(m).forEach(mod => {
+      const o = document.createElement('option');
+      o.value = mod; o.textContent = mod;
+      selModelo.appendChild(o);
+    });
+  }
+}
+
+function updateTipos() {
+  const m = selMarca.value;
+  const mod = selModelo.value;
+  selTipo.innerHTML = '<option value="">— Todos los tipos —</option>';
+  selTipo.disabled = false;
+  if (m && mod) {
+    getTipos(m, mod).forEach(t => {
+      const o = document.createElement('option');
+      o.value = t; o.textContent = t;
+      selTipo.appendChild(o);
+    });
+  }
+}
+
+function fmt(n) {
+  return new Intl.NumberFormat('es-AR', {maximumFractionDigits: 0}).format(n);
+}
+
+function buscar() {
+  const m = selMarca.value;
+  const mod = selModelo.value;
+  const tipo = selTipo.value;
+  const anio = selAnio.value;
+  const div = document.getElementById('resultado');
+
+  let results = DATA.filter(d => {
+    if (m && d.marca !== m) return false;
+    if (mod && d.modelo !== mod) return false;
+    if (tipo && d.tipo !== tipo) return false;
+    return true;
+  });
+
+  if (!m && !mod) {
+    div.innerHTML = '<div class="no-result"><span>🔍</span>Seleccioná al menos una Marca para buscar.</div>';
+    return;
+  }
+
+  if (results.length === 0) {
+    div.innerHTML = '<div class="no-result"><span>—</span>Sin resultados para la búsqueda.</div>';
+    return;
+  }
+
+  let html = `<div class="result-header">
+    <div class="result-count"><strong>${results.length}</strong> resultado${results.length > 1 ? 's' : ''} encontrado${results.length > 1 ? 's' : ''}</div>
+    ${anio ? `<div class="result-count">Filtrando por año: <strong style="color:var(--accent)">${anio === '0Km' ? '0 Km' : anio}</strong></div>` : ''}
+  </div>`;
+
+  results.forEach((r, idx) => {
+    const precios = r.precios;
+    const aniosDisp = Object.keys(precios);
+
+    // If year filter active, show only if that year exists
+    if (anio && !precios[anio]) return;
+
+    html += `<div class="card" style="animation-delay: ${idx * 0.05}s">
+      <div class="card-head">
+        <div class="card-title">
+          <div class="card-modelo">${r.modelo}</div>
+          <div class="card-marca">${r.marca}</div>
+        </div>
+        <div class="card-tipo">${r.tipo}</div>
+      </div>
+      <div class="card-body">`;
+
+    if (anio) {
+      // Single year highlight
+      const val = precios[anio];
+      const pat = anio !== '0Km' ? getPatente(r.marca, r.modelo, anio) : null;
+      html += `<div style="padding:8px 0; font-family:'IBM Plex Mono',monospace;">
+        <div style="font-size:0.65rem;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;">Valor ${anio === '0Km' ? '0 Km (nuevo)' : anio}</div>
+        <div style="font-size:2rem;color:var(--accent);letter-spacing:1px;"><span style="font-size:0.9rem;color:var(--muted);margin-right:4px;">$</span>${fmt(val)}</div>
+        ${pat ? `<div style="margin-top:6px;font-size:0.72rem;color:var(--muted);">Patente bimestral CABA: <span style="color:var(--accent);font-weight:600;">$${fmt(pat)}</span></div>` : ''}
+      </div>`;
+    } else {
+      // All years as chips
+      html += `<div class="prices-grid">`;
+      ['0Km', ...Object.keys(precios).filter(k => k !== '0Km').map(Number).sort((a,b) => b-a).map(String)].forEach(a => {
+        if (!precios[a]) return;
+        const pat = a !== '0Km' ? getPatente(r.marca, r.modelo, a) : null;
+        html += `<div class="price-chip">
+          <div class="chip-anio">${a === '0Km' ? '0 Km' : a}</div>
+          <div class="chip-valor"><span class="chip-currency">$ </span>${fmt(precios[a])}</div>
+          ${pat ? `<div style="font-size:0.6rem;color:var(--muted);margin-top:3px;">Pat: <span style="color:var(--accent);">$${fmt(pat)}</span></div>` : ''}
+        </div>`;
+      });
+      html += `</div>`;
+    }
+
+    html += `</div></div>`;
+  });
+
+  div.innerHTML = html;
+}
+
+function limpiar() {
+  selMarca.value = '';
+  selModelo.innerHTML = '<option value="">— Seleccionar —</option>';
+  selModelo.disabled = true;
+  selTipo.innerHTML = '<option value="">— Seleccionar —</option>';
+  selTipo.disabled = true;
+  selAnio.value = '';
+  document.getElementById('resultado').innerHTML = '';
+}
+</script>
+
+</body>
+</html>
